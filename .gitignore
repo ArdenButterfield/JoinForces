@@ -27,4 +27,6 @@ Testing
 cmake-build-debug
 cmake-build-release
 cmake-build-relwithdebinfo
+cmake-build-debug-visual-studio
+cmake-build-release-visual-studio
 packaging/Output/*
