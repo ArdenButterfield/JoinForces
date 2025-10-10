@@ -26,6 +26,7 @@ TEST_CASE("Formats", "[formats]") {
     REQUIRE (formatManager.getNumFormats() > 0);
 }
 
+#ifdef RUN_ON_MY_COMPUTER
 TEST_CASE("Plugin load dry run", "[pldr]") {
     juce::AudioPluginFormatManager pluginmanager;
     std::unique_ptr<juce::AudioPluginInstance> plugin_instance;
@@ -50,6 +51,7 @@ TEST_CASE("Plugin load dry run", "[pldr]") {
         }
     }
 }
+#endif
 
 TEST_CASE("Audio unchanged with no plugins loaded", "[audio unchanged]") {
     PluginProcessor testPlugin;
