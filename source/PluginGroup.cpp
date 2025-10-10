@@ -67,12 +67,7 @@ int PluginGroup::addPlugin(const juce::String& path, juce::String& errorMessage)
 
 
     auto node = formatManager.createPluginInstance(*description, sampleRate, samplesPerBlock, errorMessage);
-    /*
-    if (instances.back() == nullptr) {
-        instances.pop_back();
-        return 1;
-    }
-    */
+
     return 0;
 }
 

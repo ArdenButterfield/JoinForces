@@ -12,6 +12,7 @@ PluginProcessor::PluginProcessor()
                      #endif
                        )
 {
+    pluginGroup = std::make_unique<PluginGroup>(getBusesLayout());
 }
 
 PluginProcessor::~PluginProcessor()
