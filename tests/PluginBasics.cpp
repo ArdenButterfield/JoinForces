@@ -4,7 +4,6 @@
 #include <catch2/catch_test_macros.hpp>
 #include <catch2/matchers/catch_matchers_string.hpp>
 
-#define RUN_ON_MY_COMPUTER 0
 
 TEST_CASE ("one is equal to one", "[dummy]")
 {
