@@ -1,4 +1,5 @@
 #include "PluginEditor.h"
+#include <iostream>
 
 PluginEditor::PluginEditor (PluginProcessor& p)
     : AudioProcessorEditor (&p), processorRef (p)
@@ -45,4 +46,24 @@ void PluginEditor::resized()
     auto area = getLocalBounds();
     area.removeFromBottom(50);
     inspectButton.setBounds (getLocalBounds().withSizeKeepingCentre(100, 50));
+}
+
+void PluginEditor::mouseUp(const juce::MouseEvent &event) {
+    std::cout << "mouse up\n";
+    fileChooser = std::make_unique<juce::FileChooser> ("Select an audio plugin...",
+                                           juce::File::getSpecialLocation (juce::File::userHomeDirectory),
+                                           "*");
+
+    auto folderChooserFlags = juce::FileBrowserComponent::openMode | juce::FileBrowserComponent::canSelectDirectories | juce::FileBrowserComponent::canSelectFiles;
+
+    fileChooser->launchAsync (folderChooserFlags, [this] (const juce::FileChooser& chooser)
+    {
+        juce::File file (chooser.getResult());
+
+        juce::String errorMessage;
+        processorRef.getPluginGroup()->addPlugin(file, errorMessage);
+        if (errorMessage != "") {
+            std::cout << "error in adding plugin:" << errorMessage << "\n";
+        }
+    });
 }

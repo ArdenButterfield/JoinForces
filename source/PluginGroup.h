@@ -6,6 +6,7 @@
 #define JOINFORCES_PLUGINGROUP_H
 
 #include <vector>
+#include <list>
 #include <memory>
 
 #include "juce_core/juce_core.h"
@@ -17,14 +18,14 @@ class PluginGroup {
 public:
     PluginGroup(juce::AudioProcessor::BusesLayout layout);
     ~PluginGroup();
-    int addPlugin(const juce::String& path, juce::String& errorMessage);
+    int addPlugin(const juce::File& file, juce::String& errorMessage);
     void prepareToPlay(int inputChannels, int outputChannels, double sampleRate, int samplesPerBlockExpected);
     void processBlock(juce::AudioBuffer<float>& buffer, juce::MidiBuffer& m);
     void releaseResources();
 private:
     bool hasChanged;
     void updateGraph();
-    std::vector<std::unique_ptr<juce::AudioPluginInstance>> instances;
+    std::vector<juce::AudioProcessorGraph::NodeID> nodeIDs;
     std::unique_ptr<juce::AudioFormatReader> inputReader;
     juce::AudioPluginFormatManager formatManager;
     juce::KnownPluginList knownPlugins;

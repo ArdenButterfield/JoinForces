@@ -4,6 +4,8 @@
 #include <catch2/catch_test_macros.hpp>
 #include <catch2/matchers/catch_matchers_string.hpp>
 
+#define RUN_ON_MY_COMPUTER 0
+
 TEST_CASE ("one is equal to one", "[dummy]")
 {
     REQUIRE (1 == 1);
@@ -50,6 +52,28 @@ TEST_CASE("Plugin load dry run", "[pldr]") {
             std::cout << "created " << descs[0]->descriptiveName << "\n";
         }
     }
+}
+
+TEST_CASE("Load plugin into group", "[lpig]") {
+    PluginProcessor testPlugin;
+    testPlugin.prepareToPlay(44100, 1024);
+    juce::String err = "";
+    testPlugin.getPluginGroup()->addPlugin({R"(C:\Program Files\Common Files\VST3\ValhallaDelay.vst3)"}, err);
+    REQUIRE (err == "");
+    auto buffer = juce::AudioBuffer<float>(2, 1024);
+    auto midiBuffer = juce::MidiBuffer();
+    for (int i = 0; i < buffer.getNumSamples(); ++i) {
+        buffer.setSample(0, i, 0.5);
+    }
+    testPlugin.processBlock(buffer, midiBuffer);
+    testPlugin.processBlock(buffer, midiBuffer);
+    testPlugin.processBlock(buffer, midiBuffer);
+    /*
+    for (int i = 0; i < buffer.getNumSamples(); ++i) {
+        REQUIRE (buffer.getSample(0, i) == 0.5);
+    }
+    */
+
 }
 #endif
 

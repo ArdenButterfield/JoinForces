@@ -39,6 +39,9 @@ public:
     void getStateInformation (juce::MemoryBlock& destData) override;
     void setStateInformation (const void* data, int sizeInBytes) override;
 
+    PluginGroup* getPluginGroup() {
+        return pluginGroup.get();
+    }
 private:
     std::unique_ptr<PluginGroup> pluginGroup;
 

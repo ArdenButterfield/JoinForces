@@ -16,7 +16,38 @@ PluginGroup::~PluginGroup() {
 }
 
 void PluginGroup::updateGraph() {
-    hasChanged = false;
+    if (hasChanged) {
+        hasChanged = false;
+        for (auto& connection : graph.getConnections()) {
+            graph.removeConnection(connection);
+        }
+
+        if (nodeIDs.empty()) {
+            for (int channel = 0; channel < 2; channel++) {
+                graph.addConnection({
+                    {audioInputNode->nodeID, channel},
+                    {audioOutputNode->nodeID, channel}});
+            }
+        } else {
+            for (int channel = 0; channel < 2; channel++) {
+                graph.addConnection({
+                    {audioInputNode->nodeID, channel},
+                        {nodeIDs.front(), channel}});
+            }
+            for (int index = 0; index < nodeIDs.size() - 1; index++) {
+                for (int channel = 0; channel < 2; channel++) {
+                    graph.addConnection({
+                        {nodeIDs[index], channel},
+                        {nodeIDs[index + 1], channel} });
+                }
+            }
+            for (int channel = 0; channel < 2; channel++) {
+                graph.addConnection({
+                    {nodeIDs.back(), channel},
+                        {audioOutputNode->nodeID, channel}});
+            }
+        }
+    }
 }
 
 
@@ -56,18 +87,24 @@ void PluginGroup::processBlock(juce::AudioBuffer<float> &buffer, juce::MidiBuffe
     graph.processBlock(buffer, m);
 }
 
-int PluginGroup::addPlugin(const juce::String& path, juce::String& errorMessage) {
+int PluginGroup::addPlugin(const juce::File& file, juce::String& errorMessage) {
     auto typesFound = juce::OwnedArray<juce::PluginDescription>();
-    knownPlugins.scanAndAddDragAndDroppedFiles(formatManager, {path}, typesFound);
-    auto description = knownPlugins.getTypeForFile(path);
+    knownPlugins.scanAndAddDragAndDroppedFiles(formatManager, {file.getFullPathName()}, typesFound);
+    auto description = knownPlugins.getTypeForFile(file.getFullPathName());
     if (description == nullptr) {
-        errorMessage =  "Couldn't get plugin description: " + path;
+        errorMessage =  "Couldn't get plugin description: " + file.getFullPathName();
         return 1;
     }
 
+    std::unique_ptr<juce::AudioProcessor> pluginInstance = formatManager.createPluginInstance(
+        *description, sampleRate, samplesPerBlock, errorMessage);
+    pluginInstance->setBusesLayout(busesLayout);
+    pluginInstance->prepareToPlay(sampleRate, samplesPerBlock);
+    auto newNode = graph.addNode(std::move(pluginInstance));
 
-    auto node = formatManager.createPluginInstance(*description, sampleRate, samplesPerBlock, errorMessage);
+    nodeIDs.push_back(newNode->nodeID);
 
+    hasChanged = true;
     return 0;
 }
 
