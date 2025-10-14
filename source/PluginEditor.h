@@ -21,6 +21,7 @@ private:
     PluginProcessor& processorRef;
     MappingsPanel mappingsPanel;
     juce::TextButton addPluginButton;
+    juce::Viewport mappingViewport;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (PluginEditor)
 };

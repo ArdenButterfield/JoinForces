@@ -6,7 +6,8 @@ PluginEditor::PluginEditor (PluginProcessor& p)
 {
     juce::ignoreUnused (processorRef);
 
-    addAndMakeVisible (mappingsPanel);
+    addAndMakeVisible(mappingViewport);
+    mappingViewport.setViewedComponent(&mappingsPanel, false);
     addAndMakeVisible(addPluginButton);
 
     addPluginButton.setButtonText("Add plugin");
@@ -35,10 +36,13 @@ PluginEditor::PluginEditor (PluginProcessor& p)
     // Make sure that before the constructor has finished, you've set the
     // editor's size to whatever you need it to be.
     setSize (400, 300);
+
+    setResizable (true, true);
 }
 
 PluginEditor::~PluginEditor()
 {
+    mappingViewport.setViewedComponent(nullptr);
 }
 
 void PluginEditor::paint (juce::Graphics& g)
@@ -55,6 +59,6 @@ void PluginEditor::paint (juce::Graphics& g)
 
 void PluginEditor::resized()
 {
-    mappingsPanel.setBounds (getLocalBounds().withTrimmedTop(10).withTrimmedLeft(10).withTrimmedRight(10).withTrimmedBottom(40));
+    mappingViewport.setBounds (getLocalBounds().withTrimmedTop(10).withTrimmedLeft(10).withTrimmedRight(10).withTrimmedBottom(40));
     addPluginButton.setBounds (getLocalBounds().withHeight(30).withBottomY(getHeight()).withWidth(150));
 }

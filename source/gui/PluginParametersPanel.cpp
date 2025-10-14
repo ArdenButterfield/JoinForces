@@ -14,7 +14,9 @@ PluginParametersPanel::~PluginParametersPanel() {
 }
 
 void PluginParametersPanel::resized() {
-    Component::resized();
+    for (int i = 0; i < parameterRows.size(); i++) {
+        parameterRows[i]->setBounds(getLocalBounds().withHeight(parameterRowHeight).withY(parameterRowHeight * i));
+    }
 }
 
 void PluginParametersPanel::paint(juce::Graphics &g) {
@@ -24,15 +26,25 @@ void PluginParametersPanel::paint(juce::Graphics &g) {
 }
 
 void PluginParametersPanel::updateDisplay() {
+    for (auto& row : parameterRows) {
+        removeChildComponent(row.get());
+    }
+
     auto processor = graph.getNodeForId(nodeID);
+    parameterRows.clear();
     if (processor) {
-        std::cout << "processor params\n";
         for (auto& param : processor->getProcessor()->getParameters()) {
-            std::cout << param->getName(1024) << "\n";
+            if (param->isAutomatable()) {
+                parameterRows.push_back(std::make_unique<ParameterRow>(*param));
+            }
         }
+        for (auto& row : parameterRows) {
+            addAndMakeVisible(row.get());
+        }
+        resized();
     }
 }
 
-int PluginParametersPanel::getDesiredHeight() {
-    return 20;
+int PluginParametersPanel::getDesiredHeight() const {
+    return parameterRows.size() * parameterRowHeight;
 }

@@ -19,7 +19,12 @@ void MappingsPanel::paint(juce::Graphics &g) {
 }
 
 void MappingsPanel::resized() {
-    Component::resized();
+    int y = 0;
+    for (auto& panel : pluginPanels) {
+        auto panelDesiredHeight = panel->getDesiredHeight();
+        panel->setBounds(getLocalBounds().withY(y).withHeight(panelDesiredHeight));
+        y += panelDesiredHeight;
+    }
 }
 
 void MappingsPanel::updateDisplay() {
@@ -33,7 +38,11 @@ void MappingsPanel::updateDisplay() {
     for (auto& panel : pluginPanels) {
         addAndMakeVisible(panel.get());
     }
-    resized();
+    auto neededHeight = 0;
+    for (auto& panel : pluginPanels) {
+        neededHeight += panel->getDesiredHeight();
+    }
+    setSize(getParentComponent()->getWidth(), neededHeight);
 }
 
 void MappingsPanel::groupUpdated(const PluginGroup &_group) {

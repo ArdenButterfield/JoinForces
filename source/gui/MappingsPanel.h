@@ -23,6 +23,7 @@ public:
 private:
     std::vector<std::unique_ptr<PluginParametersPanel>> pluginPanels;
     PluginGroup& group;
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(MappingsPanel)
 };
 
 
