@@ -6,7 +6,10 @@
 
 #include <utility>
 
-PluginGroup::PluginGroup(juce::AudioProcessor::BusesLayout layout) : busesLayout(std::move(layout)) {
+void PluginGroup::Listener::groupUpdated(const PluginGroup &group) {
+}
+
+PluginGroup::PluginGroup(juce::AudioProcessor::BusesLayout layout) : hasChanged(false), busesLayout(std::move(layout)) {
     formatManager.addDefaultFormats();
     sampleRate = 0;
     samplesPerBlock = 0;
@@ -105,10 +108,22 @@ int PluginGroup::addPlugin(const juce::File& file, juce::String& errorMessage) {
     nodeIDs.push_back(newNode->nodeID);
 
     hasChanged = true;
+    for (auto& listener : listeners) {
+        listener->groupUpdated(*this);
+    }
+
     return 0;
 }
 
 void PluginGroup::releaseResources() {
     graph.releaseResources();
+}
+
+void PluginGroup::addListener(Listener* listener) {
+    listeners.insert(listener);
+}
+
+void PluginGroup::removeListener(Listener* listener) {
+    listeners.erase(listener);
 }
 

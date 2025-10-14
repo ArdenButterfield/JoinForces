@@ -2,21 +2,34 @@
 #include <iostream>
 
 PluginEditor::PluginEditor (PluginProcessor& p)
-    : AudioProcessorEditor (&p), processorRef (p)
+    : AudioProcessorEditor (&p), processorRef (p), mappingsPanel (*p.getPluginGroup())
 {
     juce::ignoreUnused (processorRef);
 
-    addAndMakeVisible (inspectButton);
+    addAndMakeVisible (mappingsPanel);
+    addAndMakeVisible(addPluginButton);
+
+    addPluginButton.setButtonText("Add plugin");
 
     // this chunk of code instantiates and opens the melatonin inspector
-    inspectButton.onClick = [&] {
-        if (!inspector)
-        {
-            inspector = std::make_unique<melatonin::Inspector> (*this);
-            inspector->onClose = [this]() { inspector.reset(); };
-        }
+    addPluginButton.onClick = [&] {
+        fileChooser = std::make_unique<juce::FileChooser> ("Select an audio plugin...",
+                                       juce::File::getSpecialLocation (juce::File::globalApplicationsDirectory),
+                                       "*");
 
-        inspector->setVisible (true);
+        auto folderChooserFlags = juce::FileBrowserComponent::openMode | juce::FileBrowserComponent::canSelectDirectories | juce::FileBrowserComponent::canSelectFiles;
+
+        fileChooser->launchAsync (folderChooserFlags, [this] (const juce::FileChooser& chooser)
+        {
+            juce::File file (chooser.getResult());
+
+            juce::String errorMessage;
+            processorRef.getPluginGroup()->addPlugin(file, errorMessage);
+            if (errorMessage != "") {
+                std::cout << "error in adding plugin:" << errorMessage << "\n";
+            }
+        });
+
     };
 
     // Make sure that before the constructor has finished, you've set the
@@ -42,28 +55,6 @@ void PluginEditor::paint (juce::Graphics& g)
 
 void PluginEditor::resized()
 {
-    // layout the positions of your child components here
-    auto area = getLocalBounds();
-    area.removeFromBottom(50);
-    inspectButton.setBounds (getLocalBounds().withSizeKeepingCentre(100, 50));
-}
-
-void PluginEditor::mouseUp(const juce::MouseEvent &event) {
-    std::cout << "mouse up\n";
-    fileChooser = std::make_unique<juce::FileChooser> ("Select an audio plugin...",
-                                           juce::File::getSpecialLocation (juce::File::userHomeDirectory),
-                                           "*");
-
-    auto folderChooserFlags = juce::FileBrowserComponent::openMode | juce::FileBrowserComponent::canSelectDirectories | juce::FileBrowserComponent::canSelectFiles;
-
-    fileChooser->launchAsync (folderChooserFlags, [this] (const juce::FileChooser& chooser)
-    {
-        juce::File file (chooser.getResult());
-
-        juce::String errorMessage;
-        processorRef.getPluginGroup()->addPlugin(file, errorMessage);
-        if (errorMessage != "") {
-            std::cout << "error in adding plugin:" << errorMessage << "\n";
-        }
-    });
+    mappingsPanel.setBounds (getLocalBounds().withTrimmedTop(10).withTrimmedLeft(10).withTrimmedRight(10).withTrimmedBottom(40));
+    addPluginButton.setBounds (getLocalBounds().withHeight(30).withBottomY(getHeight()).withWidth(150));
 }
