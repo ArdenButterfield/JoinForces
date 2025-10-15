@@ -8,14 +8,34 @@ PluginParametersPanel::PluginParametersPanel(
     juce::AudioProcessorGraph::NodeID _nodeID, juce::AudioProcessorGraph& _graph) :
     nodeID(_nodeID), graph(_graph) {
     updateDisplay();
+
+    auto processor = graph.getNodeForId(nodeID);
+    if (processor && processor->getProcessor() != nullptr && processor->getProcessor()->hasEditor()) {
+        addAndMakeVisible(openEditorButton);
+        openEditorButton.onClick = [&] {
+            auto processor = graph.getNodeForId(nodeID);
+            if (processor && processor->getProcessor() != nullptr && processor->getProcessor()->hasEditor()) {
+                subpluginWindow = std::make_unique<SubpluginWindow>(*processor->getProcessor());
+                addAndMakeVisible(subpluginWindow.get());
+                subpluginWindow->setVisible(true);
+            }
+        };
+
+    }
 }
 
-PluginParametersPanel::~PluginParametersPanel() {
-}
+PluginParametersPanel::~PluginParametersPanel() = default;
 
 void PluginParametersPanel::resized() {
     for (int i = 0; i < parameterRows.size(); i++) {
-        parameterRows[i]->setBounds(getLocalBounds().withHeight(parameterRowHeight).withY(parameterRowHeight * i));
+        parameterRows[i]->setBounds(getLocalBounds()
+            .withHeight(parameterRowHeight)
+            .withY(parameterRowHeight * i)
+            .withTrimmedLeft(15));
+    }
+
+    if (openEditorButton.isVisible()) {
+        openEditorButton.setBounds(getLocalBounds().withHeight(10).withWidth(10).withBottomY(getHeight()));
     }
 }
 

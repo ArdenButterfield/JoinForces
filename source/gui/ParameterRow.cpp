@@ -4,8 +4,8 @@
 
 #include "ParameterRow.h"
 
-ParameterRow::ParameterRow(juce::AudioProcessorParameter &param) : parameter(param) {
-
+ParameterRow::ParameterRow(juce::AudioProcessorParameter &param) : parameter(param), currentParamSlider(param) {
+    addAndMakeVisible(currentParamSlider);
 }
 
 ParameterRow::~ParameterRow() {
@@ -13,13 +13,12 @@ ParameterRow::~ParameterRow() {
 }
 
 void ParameterRow::paint(juce::Graphics &g) {
-    g.fillAll(juce::Colours::darkgreen);
+    g.fillAll(parameter.isDiscrete() ? juce::Colours::darkgreen : juce::Colours::brown);
     g.setColour(juce::Colours::white);
     g.drawRect(getLocalBounds(), 3);
-    g.drawText(parameter.getName(1024), getLocalBounds(), juce::Justification::left);
+    g.drawText(parameter.getName(1024), getLocalBounds().withTrimmedLeft(10), juce::Justification::left);
 }
 
 void ParameterRow::resized() {
-
+    currentParamSlider.setBounds(getLocalBounds().withTrimmedLeft(100));
 }
-

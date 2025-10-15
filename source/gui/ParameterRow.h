@@ -8,6 +8,8 @@
 #include "juce_gui_basics/juce_gui_basics.h"
 #include "juce_audio_processors/juce_audio_processors.h"
 
+#include "CurrentParameterValueSlider.h"
+
 class ParameterRow : public juce::Component {
 public:
     ParameterRow(juce::AudioProcessorParameter& param);
@@ -16,6 +18,8 @@ public:
     void resized() override;
 private:
     juce::AudioProcessorParameter& parameter;
+    CurrentParameterValueSlider currentParamSlider;
+
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(ParameterRow)
 };
 
