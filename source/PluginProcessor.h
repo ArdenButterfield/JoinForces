@@ -2,6 +2,8 @@
 
 #include <juce_audio_processors/juce_audio_processors.h>
 #include "PluginGroup.h"
+#include "MappingCenter.h"
+#include "ForceFeedbackInterface.h"
 
 #if (MSVC)
 #include "ipps.h"
@@ -44,6 +46,8 @@ public:
     }
 private:
     std::unique_ptr<PluginGroup> pluginGroup;
+    std::unique_ptr<MappingCenter> mappingCenter;
+    std::unique_ptr<ForceFeedbackInterface> forceFeedbackInterface;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (PluginProcessor)
 };

@@ -13,6 +13,8 @@ PluginProcessor::PluginProcessor()
                        )
 {
     pluginGroup = std::make_unique<PluginGroup>(getBusesLayout());
+    forceFeedbackInterface = std::make_unique<ForceFeedbackInterface>();
+    mappingCenter = std::make_unique<MappingCenter>(*pluginGroup, *forceFeedbackInterface);
 }
 
 PluginProcessor::~PluginProcessor()
