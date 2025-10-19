@@ -2,15 +2,18 @@
 #include <iostream>
 
 PluginEditor::PluginEditor (PluginProcessor& p)
-    : AudioProcessorEditor (&p), processorRef (p), mappingsPanel (*p.getPluginGroup())
+    : AudioProcessorEditor (&p), processorRef (p), mappingsPanel (*p.getPluginGroup()), positionVisualizer (*processorRef.getForceFeedbackInterface())
 {
     juce::ignoreUnused (processorRef);
 
     addAndMakeVisible(mappingViewport);
     mappingViewport.setViewedComponent(&mappingsPanel, false);
-    addAndMakeVisible(addPluginButton);
 
+    addAndMakeVisible(addPluginButton);
     addPluginButton.setButtonText("Add plugin");
+
+    addAndMakeVisible(createMappingButton);
+    createMappingButton.setButtonText("Create mapping");
 
     // this chunk of code instantiates and opens the melatonin inspector
     addPluginButton.onClick = [&] {
@@ -30,8 +33,12 @@ PluginEditor::PluginEditor (PluginProcessor& p)
                 std::cout << "error in adding plugin:" << errorMessage << "\n";
             }
         });
-
     };
+    createMappingButton.onClick = [&] {
+        processorRef.getMappingCenter()->createMappingAtCurrentState();
+    };
+
+    addAndMakeVisible(positionVisualizer);
 
     // Make sure that before the constructor has finished, you've set the
     // editor's size to whatever you need it to be.
@@ -61,4 +68,6 @@ void PluginEditor::resized()
 {
     mappingViewport.setBounds (getLocalBounds().withTrimmedTop(10).withTrimmedLeft(10).withTrimmedRight(10).withTrimmedBottom(40));
     addPluginButton.setBounds (getLocalBounds().withHeight(30).withBottomY(getHeight()).withWidth(150));
+    createMappingButton.setBounds(addPluginButton.getBounds().withX(addPluginButton.getRight() + 10));
+    positionVisualizer.setBounds(0,0, 200,200);
 }

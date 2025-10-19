@@ -2,6 +2,7 @@
 
 #include "PluginProcessor.h"
 #include "gui/MappingsPanel.h"
+#include "gui/PositionVisualizer.h"
 
 //==============================================================================
 class PluginEditor : public juce::AudioProcessorEditor
@@ -22,6 +23,8 @@ private:
     MappingsPanel mappingsPanel;
     juce::TextButton addPluginButton;
     juce::Viewport mappingViewport;
+    juce::TextButton createMappingButton;
+    PositionVisualizer positionVisualizer;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (PluginEditor)
 };

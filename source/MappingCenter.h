@@ -31,6 +31,9 @@ public:
     const std::vector<MappingPoint>& getMappings() {
         return mappings;
     }
+
+    PluginGroup& group;
+    ForceFeedbackInterface& interface;
 private:
     std::vector<MappingPoint> mappings;
 };
