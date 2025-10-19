@@ -20,5 +20,5 @@ void ParameterRow::paint(juce::Graphics &g) {
 }
 
 void ParameterRow::resized() {
-    currentParamSlider.setBounds(getLocalBounds().withTrimmedLeft(100));
+    currentParamSlider.setBounds(getLocalBounds().withTrimmedLeft(120));
 }

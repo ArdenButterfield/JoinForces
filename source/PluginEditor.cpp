@@ -57,17 +57,17 @@ void PluginEditor::paint (juce::Graphics& g)
     // (Our component is opaque, so we must completely fill the background with a solid colour)
     g.fillAll (getLookAndFeel().findColour (juce::ResizableWindow::backgroundColourId));
 
-    auto area = getLocalBounds();
-    g.setColour (juce::Colours::white);
-    g.setFont (16.0f);
-    auto helloWorld = juce::String ("Hello from ") + PRODUCT_NAME_WITHOUT_VERSION + " v" VERSION + " running in " + CMAKE_BUILD_TYPE;
-    g.drawText (helloWorld, area.removeFromTop (150), juce::Justification::centred, false);
+    g.setColour(juce::Colours::black);
+    g.fillRect(mappingViewport.getBounds());
 }
 
 void PluginEditor::resized()
 {
-    mappingViewport.setBounds (getLocalBounds().withTrimmedTop(10).withTrimmedLeft(10).withTrimmedRight(10).withTrimmedBottom(40));
-    addPluginButton.setBounds (getLocalBounds().withHeight(30).withBottomY(getHeight()).withWidth(150));
-    createMappingButton.setBounds(addPluginButton.getBounds().withX(addPluginButton.getRight() + 10));
-    positionVisualizer.setBounds(0,0, 200,200);
+    auto usableArea = getLocalBounds().withSizeKeepingCentre(getWidth() - 20, getHeight() - 20);
+    positionVisualizer.setBounds(usableArea.withHeight(120).withWidth(200));
+
+    createMappingButton.setBounds(usableArea.withX(positionVisualizer.getRight() + 10).withHeight(30).withWidth(150));
+    addPluginButton.setBounds(createMappingButton.getBounds().withY(createMappingButton.getBottom() + 10));
+
+    mappingViewport.setBounds(usableArea.withTrimmedTop(positionVisualizer.getHeight() + 10));
 }

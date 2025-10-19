@@ -42,7 +42,7 @@ void MappingsPanel::updateDisplay() {
     for (auto& panel : pluginPanels) {
         neededHeight += panel->getDesiredHeight();
     }
-    setSize(getParentComponent()->getWidth(), neededHeight);
+    setSize(300, neededHeight);
 }
 
 void MappingsPanel::groupUpdated(const PluginGroup &_group) {
