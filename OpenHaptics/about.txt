@@ -1,0 +1,3 @@
+Downloaded from https://support.3dsystems.com/s/article/OpenHaptics-for-Linux-Developer-Edition-v34?language=en_US
+
+See doc/OpenHapticsDeveloperEditionLicense.txt for license
