@@ -6,7 +6,7 @@
 
 #include "../ForceFeedbackInterface.h"
 
-PositionVisualizer::PositionVisualizer(ForceFeedbackInterface &_interface) : interface(_interface) {
+PositionVisualizer::PositionVisualizer(ForceFeedbackInterface &_ffinterface) : ffInterface(_ffinterface) {
     startTimerHz(60);
 
     for (auto& slider : sliders) {
@@ -35,7 +35,7 @@ void PositionVisualizer::resized() {
 }
 
 void PositionVisualizer::timerCallback() {
-    auto pos = interface.getCurrentPosition();
+    auto pos = ffInterface.getCurrentPosition();
     sliders[0].setValue(pos.x);
     sliders[1].setValue(pos.y);
     sliders[2].setValue(pos.z);

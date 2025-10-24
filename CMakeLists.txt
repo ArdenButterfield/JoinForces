@@ -106,14 +106,39 @@ include(SharedCodeDefaults)
 # Just ensure you employ CONFIGURE_DEPENDS so the build system picks up changes
 # If you want to appease the CMake gods and avoid globs, manually add files like so:
 # set(SourceFiles Source/PluginEditor.h Source/PluginProcessor.h Source/PluginEditor.cpp Source/PluginProcessor.cpp)
-file(GLOB_RECURSE SourceFiles CONFIGURE_DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/source/*.cpp" "${CMAKE_CURRENT_SOURCE_DIR}/source/*.h")
+file(GLOB_RECURSE SourceFiles CONFIGURE_DEPENDS
+        "${CMAKE_CURRENT_SOURCE_DIR}/source/*.cpp" "${CMAKE_CURRENT_SOURCE_DIR}/source/*.h"
+        "${CMAKE_CURRENT_SOURCE_DIR}/OpenHaptics/Developer/3.5.0/utilities/src/HDU/src/*.cpp" "${CMAKE_CURRENT_SOURCE_DIR}/OpenHaptics/Developer/3.5.0/utilities/src/HDU/src/*.h"
+        "${CMAKE_CURRENT_SOURCE_DIR}/OpenHaptics/Developer/3.5.0/utilities/src/HLU/src/*.cpp" "${CMAKE_CURRENT_SOURCE_DIR}/OpenHaptics/Developer/3.5.0/utilities/src/HLU/src/*.h"
+#        "${CMAKE_CURRENT_SOURCE_DIR}/OpenHaptics/libsrc/HDU/*.c" "${CMAKE_CURRENT_SOURCE_DIR}/OpenHaptics/libsrc/HDU/*.h"
+#        "${CMAKE_CURRENT_SOURCE_DIR}/OpenHaptics/libsrc/HLU/*.c" "${CMAKE_CURRENT_SOURCE_DIR}/OpenHaptics/libsrc/HLU/*.h"
+)
 target_sources(SharedCode INTERFACE ${SourceFiles})
+
+target_include_directories(SharedCode INTERFACE
+        ${CMAKE_SOURCE_DIR}/freeglut-MSVC-3.0.0-2.mp/freeglut/include
+        ${CMAKE_SOURCE_DIR}/OpenHaptics/Developer/3.5.0/include
+        ${CMAKE_SOURCE_DIR}/OpenHaptics/Developer/3.5.0/utilities/include
+)
+
+find_package(OpenGL REQUIRED)
+include_directories( ${OPENGL_INCLUDE_DIRS} )
+
+#target_link_libraries(
+#        SharedCode INTERFACE
+#        ${CMAKE_SOURCE_DIR}/OpenHaptics/Developer/3.5.0/lib/x64/${CMAKE_BUILD_TYPE}/hd.lib
+#        ${CMAKE_SOURCE_DIR}/OpenHaptics/Developer/3.5.0/lib/x64/${CMAKE_BUILD_TYPE}/hl.lib
+#        ${CMAKE_SOURCE_DIR}/OpenHaptics/Developer/3.5.0/utilities/lib/x64/${CMAKE_BUILD_TYPE}/glut32.lib
+#        ${CMAKE_SOURCE_DIR}/OpenHaptics/Developer/3.5.0/utilities/lib/x64/${CMAKE_BUILD_TYPE}/glui32.lib
+#        ${CMAKE_SOURCE_DIR}/freeglut-MSVC-3.0.0-2.mp/freeglut/lib/x64/freeglut.lib
+#)
+
 
 # Adds a BinaryData target for embedding assets into the binary
 include(Assets)
 
 # MacOS only: Cleans up folder and target organization on Xcode.
-include(XcodePrettify)
+# include(XcodePrettify)
 
 # This is where you can set preprocessor definitions for JUCE and your plugin
 target_compile_definitions(SharedCode
@@ -152,7 +177,14 @@ target_link_libraries(SharedCode
     juce_gui_extra
     juce::juce_recommended_config_flags
     juce::juce_recommended_lto_flags
-    juce::juce_recommended_warning_flags)
+    juce::juce_recommended_warning_flags
+    ${OPENGL_LIBRARIES}
+    ${CMAKE_SOURCE_DIR}/OpenHaptics/Developer/3.5.0/lib/x64/${CMAKE_BUILD_TYPE}/hd.lib
+    ${CMAKE_SOURCE_DIR}/OpenHaptics/Developer/3.5.0/lib/x64/${CMAKE_BUILD_TYPE}/hl.lib
+#    ${CMAKE_SOURCE_DIR}/OpenHaptics/Developer/3.5.0/utilities/lib/x64/${CMAKE_BUILD_TYPE}/hlu.lib
+#    ${CMAKE_SOURCE_DIR}/OpenHaptics/Developer/3.5.0/utilities/lib/x64/${CMAKE_BUILD_TYPE}/hdu.lib
+
+)
 
 # Link the JUCE plugin targets our SharedCode target
 target_link_libraries("${PROJECT_NAME}" PRIVATE SharedCode)

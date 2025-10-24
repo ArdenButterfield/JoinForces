@@ -12,14 +12,14 @@ class ForceFeedbackInterface;
 
 class PositionVisualizer : public juce::Component, public juce::Timer {
 public:
-    PositionVisualizer(ForceFeedbackInterface& interface);
+    PositionVisualizer(ForceFeedbackInterface& ffInterface);
     ~PositionVisualizer();
     void paint(juce::Graphics &g) override;
     void resized() override;
     void timerCallback() override;
 private:
     std::array<juce::Slider, 3> sliders;
-    ForceFeedbackInterface& interface;
+    ForceFeedbackInterface& ffInterface;
 };
 
 #endif //JOINFORCES_POSITIONVISUALIZER_H

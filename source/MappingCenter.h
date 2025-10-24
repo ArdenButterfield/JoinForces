@@ -25,7 +25,7 @@ public:
         std::vector<PluginParameterSet> pluginParameters;
     };
 
-    MappingCenter(PluginGroup& group, ForceFeedbackInterface& interface);
+    MappingCenter(PluginGroup& group, ForceFeedbackInterface& ffInterface);
     ~MappingCenter();
     void createMappingAtCurrentState();
     const std::vector<MappingPoint>& getMappings() {
@@ -33,7 +33,7 @@ public:
     }
 
     PluginGroup& group;
-    ForceFeedbackInterface& interface;
+    ForceFeedbackInterface& ffInterface;
 private:
     std::vector<MappingPoint> mappings;
 };
