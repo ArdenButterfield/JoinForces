@@ -13,6 +13,7 @@ PluginGroup::PluginGroup(juce::AudioProcessor::BusesLayout layout) : hasChanged(
     formatManager.addDefaultFormats();
     sampleRate = 0;
     samplesPerBlock = 0;
+    nodeIDs.clear();
 }
 
 PluginGroup::~PluginGroup() {

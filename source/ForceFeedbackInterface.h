@@ -20,9 +20,14 @@ public:
     void init();
     juce::Vector3D<float> getCurrentPosition();
     void deInit();
+    HDCallbackCode callback();
+
 private:
+    juce::Vector3D<float> position;
     HHD ghHD = HD_INVALID_HANDLE;
+    HDSchedulerHandle schedulerHandle;
 };
 
+HDCallbackCode ffCallback(void *data);
 
 #endif //JOINFORCES_FORCEFEEDBACKINTERFACE_H

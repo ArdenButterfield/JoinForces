@@ -93,6 +93,7 @@ void PluginProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
     // initialisation that you need..
     pluginGroup = std::make_unique<PluginGroup>(getBusesLayout());
     pluginGroup->prepareToPlay(getMainBusNumInputChannels(), getMainBusNumOutputChannels(), sampleRate, samplesPerBlock);
+    forceFeedbackInterface->init();
 }
 
 void PluginProcessor::releaseResources()

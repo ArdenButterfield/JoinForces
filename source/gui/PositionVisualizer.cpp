@@ -11,6 +11,7 @@ PositionVisualizer::PositionVisualizer(ForceFeedbackInterface &_ffinterface) : f
 
     for (auto& slider : sliders) {
         slider.setSliderStyle(juce::Slider::LinearHorizontal);
+        slider.setRange(0,1);
         slider.setTextBoxStyle(juce::Slider::NoTextBox, false, 0, 0);
         slider.setInterceptsMouseClicks(false, false);
         addAndMakeVisible(slider);

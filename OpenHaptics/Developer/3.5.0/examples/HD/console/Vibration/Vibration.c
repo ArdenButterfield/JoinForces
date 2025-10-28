@@ -53,7 +53,8 @@ HDCallbackCode HDCALLBACK SetVibrationFreqCallback(void *pUserData);
 HDCallbackCode HDCALLBACK SetVibrationAmplitudeCallback(void *pUserData);
 HDCallbackCode HDCALLBACK VibrationCallback(void *pUserData);
 
-/******************************************************************************
+/****
+**************************************************************************
  Initiates a vibration effect that can be controlled using a keyboard menu
  from the main loop.
 ******************************************************************************/
