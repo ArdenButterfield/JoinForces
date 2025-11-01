@@ -10,16 +10,12 @@ PluginProcessor::PluginProcessor()
                       #endif
                        .withOutput ("Output", juce::AudioChannelSet::stereo(), true)
                      #endif
-                       )
+                       ), pluginGroup(getBusesLayout()), forceFeedbackInterface(), mappingCenter(pluginGroup, forceFeedbackInterface)
 {
-    pluginGroup = std::make_unique<PluginGroup>(getBusesLayout());
-    forceFeedbackInterface = std::make_unique<ForceFeedbackInterface>();
-    mappingCenter = std::make_unique<MappingCenter>(*pluginGroup, *forceFeedbackInterface);
 }
 
 PluginProcessor::~PluginProcessor()
-{
-}
+= default;
 
 //==============================================================================
 const juce::String PluginProcessor::getName() const
@@ -91,16 +87,15 @@ void PluginProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
 {
     // Use this method as the place to do any pre-playback
     // initialisation that you need..
-    pluginGroup = std::make_unique<PluginGroup>(getBusesLayout());
-    pluginGroup->prepareToPlay(getMainBusNumInputChannels(), getMainBusNumOutputChannels(), sampleRate, samplesPerBlock);
-    forceFeedbackInterface->init();
+    pluginGroup.prepareToPlay(getMainBusNumInputChannels(), getMainBusNumOutputChannels(), sampleRate, samplesPerBlock);
+    forceFeedbackInterface.init();
 }
 
 void PluginProcessor::releaseResources()
 {
     // When playback stops, you can use this as an opportunity to free up any
     // spare memory, etc.
-    pluginGroup->releaseResources();
+    pluginGroup.releaseResources();
 }
 
 bool PluginProcessor::isBusesLayoutSupported (const BusesLayout& layouts) const
@@ -143,7 +138,7 @@ void PluginProcessor::processBlock (juce::AudioBuffer<float>& buffer,
     for (auto i = totalNumInputChannels; i < totalNumOutputChannels; ++i)
         buffer.clear (i, 0, buffer.getNumSamples());
 
-    pluginGroup->processBlock(buffer, midiMessages);
+    pluginGroup.processBlock(buffer, midiMessages);
 }
 
 //==============================================================================

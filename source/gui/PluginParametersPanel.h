@@ -11,20 +11,23 @@
 #include "ParameterRow.h"
 #include "SubpluginWindow.h"
 
+#include "../MappingCenter.h"
+
 class PluginParametersPanel : public juce::Component {
 public:
-    PluginParametersPanel(juce::AudioProcessorGraph::NodeID nodeID, juce::AudioProcessorGraph& graph);
+    PluginParametersPanel(MappingCenter::PluginParameterSet&);
     ~PluginParametersPanel() override;
     void resized() override;
     void paint(juce::Graphics &g) override;
     void updateDisplay();
     int getDesiredHeight() const;
 private:
+    MappingCenter::PluginParameterSet& parameterSet;
+
     int parameterRowHeight = 30;
     juce::TextButton openEditorButton;
     std::vector<std::unique_ptr<ParameterRow>> parameterRows;
     const juce::AudioProcessorGraph::NodeID nodeID;
-    juce::AudioProcessorGraph& graph;
     std::unique_ptr<SubpluginWindow> subpluginWindow;
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(PluginParametersPanel)
 };

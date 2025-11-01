@@ -7,17 +7,23 @@
 
 #include <vector>
 
-#include "ForceFeedbackInterface.h"
 #include "juce_audio_processors/juce_audio_processors.h"
 #include "juce_opengl/juce_opengl.h"
 
 class PluginGroup;
+class ForceFeedbackInterface;
 
 class MappingCenter {
 public:
+
+    struct Parameter {
+        float value;
+        juce::AudioProcessorParameter& parameter;
+    };
+
     struct PluginParameterSet {
         juce::AudioProcessor& processor;
-        std::vector<float> parameterValues;
+        std::vector<Parameter> parameters;
     };
 
     struct MappingPoint {

@@ -2,7 +2,7 @@
 #include <iostream>
 
 PluginEditor::PluginEditor (PluginProcessor& p)
-    : AudioProcessorEditor (&p), processorRef (p), mappingsPanel (*p.getPluginGroup()), positionVisualizer (*processorRef.getForceFeedbackInterface())
+    : AudioProcessorEditor (&p), processorRef (p), mappingsPanel (*p.getMappingCenter())
 {
     juce::ignoreUnused (processorRef);
 
@@ -38,8 +38,6 @@ PluginEditor::PluginEditor (PluginProcessor& p)
         processorRef.getMappingCenter()->createMappingAtCurrentState();
     };
 
-    addAndMakeVisible(positionVisualizer);
-
     // Make sure that before the constructor has finished, you've set the
     // editor's size to whatever you need it to be.
     setSize (400, 300);
@@ -64,10 +62,9 @@ void PluginEditor::paint (juce::Graphics& g)
 void PluginEditor::resized()
 {
     auto usableArea = getLocalBounds().withSizeKeepingCentre(getWidth() - 20, getHeight() - 20);
-    positionVisualizer.setBounds(usableArea.withHeight(120).withWidth(200));
 
-    createMappingButton.setBounds(usableArea.withX(positionVisualizer.getRight() + 10).withHeight(30).withWidth(150));
+    createMappingButton.setBounds(usableArea.withHeight(30).withWidth(150));
     addPluginButton.setBounds(createMappingButton.getBounds().withY(createMappingButton.getBottom() + 10));
 
-    mappingViewport.setBounds(usableArea.withTrimmedTop(positionVisualizer.getHeight() + 10));
+    mappingViewport.setBounds(usableArea.withTrimmedTop(addPluginButton.getBottom() + 10));
 }

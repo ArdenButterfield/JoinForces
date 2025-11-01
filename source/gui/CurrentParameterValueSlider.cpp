@@ -4,25 +4,25 @@
 
 #include "CurrentParameterValueSlider.h"
 
-CurrentParameterValueSlider::CurrentParameterValueSlider(juce::AudioProcessorParameter &p) : parameter(p) {
+CurrentParameterValueSlider::CurrentParameterValueSlider(MappingCenter::Parameter& p) : parameter(p) {
     setSliderStyle(juce::Slider::LinearHorizontal);
     setTextBoxStyle(juce::Slider::TextBoxRight, true, 100, 40);
-    setRange(0, 1, 1.0 / (parameter.getNumSteps() - 1.0));
+    setRange(0, 1, 1.0 / (parameter.parameter.getNumSteps() - 1.0));
 }
 
 CurrentParameterValueSlider::~CurrentParameterValueSlider() {
 }
 
 double CurrentParameterValueSlider::getValueFromText(const juce::String &text) {
-    return parameter.getValueForText(text);
+    return parameter.parameter.getValueForText(text);
 }
 
 juce::String CurrentParameterValueSlider::getTextFromValue(double value) {
-    return parameter.getText(value, 64);
+    return parameter.parameter.getText(static_cast<float>(value), 64);
 }
 
 void CurrentParameterValueSlider::timerCallback() {
-    setValue(parameter.getValue());
+    setValue(parameter.value);
     updateText();
 }
 
@@ -32,5 +32,5 @@ void CurrentParameterValueSlider::resized() {
 }
 
 void CurrentParameterValueSlider::valueChanged() {
-    parameter.setValue(getValue());
+    parameter.value = getValue();
 }

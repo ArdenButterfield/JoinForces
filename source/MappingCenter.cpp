@@ -3,6 +3,7 @@
 //
 
 #include "MappingCenter.h"
+#include "ForceFeedbackInterface.h"
 
 #include "PluginGroup.h"
 

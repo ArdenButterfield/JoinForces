@@ -4,23 +4,19 @@
 
 #include "PluginParametersPanel.h"
 
-PluginParametersPanel::PluginParametersPanel(
-    juce::AudioProcessorGraph::NodeID _nodeID, juce::AudioProcessorGraph& _graph) :
-    nodeID(_nodeID), graph(_graph) {
+PluginParametersPanel::PluginParametersPanel(MappingCenter::PluginParameterSet& pps) :
+    parameterSet(pps) {
     updateDisplay();
 
-    auto processor = graph.getNodeForId(nodeID);
-    if (processor && processor->getProcessor() != nullptr && processor->getProcessor()->hasEditor()) {
+    if (parameterSet.processor.hasEditor()) {
         addAndMakeVisible(openEditorButton);
         openEditorButton.onClick = [&] {
-            auto processor = graph.getNodeForId(nodeID);
-            if (processor && processor->getProcessor() != nullptr && processor->getProcessor()->hasEditor()) {
-                subpluginWindow = std::make_unique<SubpluginWindow>(*processor->getProcessor());
+            if (parameterSet.processor.hasEditor()) {
+                subpluginWindow = std::make_unique<SubpluginWindow>(parameterSet.processor);
                 addAndMakeVisible(subpluginWindow.get());
                 subpluginWindow->setVisible(true);
             }
         };
-
     }
 }
 
@@ -50,21 +46,23 @@ void PluginParametersPanel::updateDisplay() {
         removeChildComponent(row.get());
     }
 
-    auto processor = graph.getNodeForId(nodeID);
     parameterRows.clear();
-    if (processor) {
-        for (auto& param : processor->getProcessor()->getParameters()) {
-            if (param->isAutomatable()) {
-                parameterRows.push_back(std::make_unique<ParameterRow>(*param));
-            }
-        }
-        for (auto& row : parameterRows) {
-            addAndMakeVisible(row.get());
-        }
-        resized();
+
+    for (auto& param : parameterSet.parameters) {
+        parameterRows.push_back(std::make_unique<ParameterRow>(param));
     }
+
+    for (auto& param : parameterSet.processor->getParameters()) {
+        if (param->isAutomatable()) {
+            parameterRows.push_back(std::make_unique<ParameterRow>(*processor->getProcessor(), *param));
+        }
+    }
+    for (auto& row : parameterRows) {
+        addAndMakeVisible(row.get());
+    }
+    resized();
 }
 
 int PluginParametersPanel::getDesiredHeight() const {
-    return parameterRows.size() * parameterRowHeight;
+    return static_cast<int>(parameterRows.size()) * parameterRowHeight;
 }

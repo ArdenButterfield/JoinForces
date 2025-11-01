@@ -10,15 +10,17 @@
 
 #include "CurrentParameterValueSlider.h"
 
+#include "../MappingCenter.h"
+
 class ParameterRow : public juce::Component {
 public:
-    ParameterRow(juce::AudioProcessorParameter& param);
+    ParameterRow(MappingCenter::Parameter&);
     ~ParameterRow() override;
     void paint(juce::Graphics &g) override;
     void resized() override;
 private:
-    juce::AudioProcessorParameter& parameter;
-    CurrentParameterValueSlider currentParamSlider;
+    MappingCenter::Parameter& parameter;
+    CurrentParameterValueSlider currentValueSlider;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(ParameterRow)
 };

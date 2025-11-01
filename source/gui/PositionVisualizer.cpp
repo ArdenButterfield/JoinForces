@@ -6,21 +6,19 @@
 
 #include "../ForceFeedbackInterface.h"
 
-PositionVisualizer::PositionVisualizer(ForceFeedbackInterface &_ffinterface) : ffInterface(_ffinterface) {
+PositionVisualizer::PositionVisualizer(juce::Vector3D<float>& p) : position(p) {
     startTimerHz(60);
 
     for (auto& slider : sliders) {
         slider.setSliderStyle(juce::Slider::LinearHorizontal);
         slider.setRange(0,1);
         slider.setTextBoxStyle(juce::Slider::NoTextBox, false, 0, 0);
-        slider.setInterceptsMouseClicks(false, false);
+        slider.addListener(this);
         addAndMakeVisible(slider);
     }
 }
 
-PositionVisualizer::~PositionVisualizer() {
-
-}
+PositionVisualizer::~PositionVisualizer() = default;
 
 void PositionVisualizer::paint(juce::Graphics &g) {
     g.fillAll(juce::Colours::black);
@@ -36,9 +34,18 @@ void PositionVisualizer::resized() {
 }
 
 void PositionVisualizer::timerCallback() {
-    auto pos = ffInterface.getCurrentPosition();
-    sliders[0].setValue(pos.x);
-    sliders[1].setValue(pos.y);
-    sliders[2].setValue(pos.z);
+    sliders[0].setValue(position.x, juce::dontSendNotification);
+    sliders[1].setValue(position.y, juce::dontSendNotification);
+    sliders[2].setValue(position.z, juce::dontSendNotification);
+}
+
+void PositionVisualizer::sliderValueChanged(juce::Slider* s) {
+    if (s == & sliders[0]) {
+        position.x = sliders[0].getValue();
+    } else if (s == & sliders[1]) {
+        position.y = sliders[1].getValue();
+    } else if (s == & sliders[2]) {
+        position.z = sliders[2].getValue();
+    }
 }
 

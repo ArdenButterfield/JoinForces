@@ -24,7 +24,6 @@ private:
     juce::TextButton addPluginButton;
     juce::Viewport mappingViewport;
     juce::TextButton createMappingButton;
-    PositionVisualizer positionVisualizer;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (PluginEditor)
 };

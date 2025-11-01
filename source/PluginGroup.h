@@ -22,7 +22,7 @@ public:
         virtual void groupUpdated(const PluginGroup& group);
     };
 
-    PluginGroup(juce::AudioProcessor::BusesLayout layout);
+    explicit PluginGroup(juce::AudioProcessor::BusesLayout layout);
     ~PluginGroup();
     int addPlugin(const juce::File& file, juce::String& errorMessage);
     void prepareToPlay(int inputChannels, int outputChannels, double sampleRate, int samplesPerBlockExpected);
@@ -37,6 +37,7 @@ public:
 
     void addListener(Listener* listener);
     void removeListener(Listener* listener);
+
 private:
     std::set<Listener*> listeners;
     bool hasChanged;

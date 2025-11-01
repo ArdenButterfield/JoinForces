@@ -4,13 +4,13 @@
 
 #include "ParameterRow.h"
 
-ParameterRow::ParameterRow(juce::AudioProcessorParameter &param) : parameter(param), currentParamSlider(param) {
-    addAndMakeVisible(currentParamSlider);
+ParameterRow::ParameterRow(MappingCenter::Parameter& p) : parameter(p) {
+    setSliderStyle(juce::Slider::LinearHorizontal);
+    setTextBoxStyle(juce::Slider::TextBoxRight, true, 100, 40);
+    setRange(0, 1, 1.0 / (parameter.getNumSteps() - 1.0));
 }
 
-ParameterRow::~ParameterRow() {
-
-}
+ParameterRow::~ParameterRow() = default;
 
 void ParameterRow::paint(juce::Graphics &g) {
     g.fillAll(parameter.isDiscrete() ? juce::Colours::darkgreen : juce::Colours::brown);

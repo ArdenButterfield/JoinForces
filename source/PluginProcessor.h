@@ -41,22 +41,22 @@ public:
     void getStateInformation (juce::MemoryBlock& destData) override;
     void setStateInformation (const void* data, int sizeInBytes) override;
 
-    PluginGroup* getPluginGroup() const {
-        return pluginGroup.get();
+    PluginGroup* getPluginGroup() {
+        return &pluginGroup;
     }
 
-    MappingCenter* getMappingCenter() const {
-        return mappingCenter.get();
+    MappingCenter* getMappingCenter() {
+        return &mappingCenter;
     }
 
-    ForceFeedbackInterface* getForceFeedbackInterface() const {
-        return forceFeedbackInterface.get();
+    ForceFeedbackInterface* getForceFeedbackInterface() {
+        return &forceFeedbackInterface;
     }
 
 private:
-    std::unique_ptr<MappingCenter> mappingCenter;
-    std::unique_ptr<PluginGroup> pluginGroup;
-    std::unique_ptr<ForceFeedbackInterface> forceFeedbackInterface;
+    PluginGroup pluginGroup;
+    ForceFeedbackInterface forceFeedbackInterface;
+    MappingCenter mappingCenter;
 
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (PluginProcessor)
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(PluginProcessor)
 };

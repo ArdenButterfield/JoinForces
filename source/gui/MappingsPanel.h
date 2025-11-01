@@ -7,21 +7,23 @@
 
 #include "PluginParametersPanel.h"
 #include "juce_gui_basics/juce_gui_basics.h"
-#include "../PluginGroup.h"
+#include "MappingPointParametersPanel.h"
+#include "CurrentStateColumn.h"
 
 #include <vector>
 #include <memory>
 
-class MappingsPanel : public juce::Component, public PluginGroup::Listener {
+class MappingCenter;
+
+class MappingsPanel : public juce::Component {
 public:
-    MappingsPanel(PluginGroup& group);
+    explicit MappingsPanel(MappingCenter&);
     ~MappingsPanel() override;
     void paint(juce::Graphics &g) override;
     void resized() override;
-    void updateDisplay();
-    void groupUpdated(const PluginGroup &group) override;
 private:
-    std::vector<std::unique_ptr<PluginParametersPanel>> pluginPanels;
+    std::unique_ptr<CurrentStateColumn> currentStateColumn;
+    std::vector<std::unique_ptr<MappingPointParametersPanel>> mappingPointPanels;
     PluginGroup& group;
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(MappingsPanel)
 };

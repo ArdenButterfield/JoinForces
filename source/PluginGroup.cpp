@@ -16,8 +16,7 @@ PluginGroup::PluginGroup(juce::AudioProcessor::BusesLayout layout) : hasChanged(
     nodeIDs.clear();
 }
 
-PluginGroup::~PluginGroup() {
-}
+PluginGroup::~PluginGroup() = default;
 
 void PluginGroup::updateGraph() {
     if (hasChanged) {
@@ -56,10 +55,13 @@ void PluginGroup::updateGraph() {
 
 
 void PluginGroup::prepareToPlay(int inputChannels, int outputChannels, double _sampleRate, int _samplesPerBlockExpected) {
+    std::cout << "prepare to play group" << this << "\n";
     sampleRate = _sampleRate;
     samplesPerBlock = _samplesPerBlockExpected;
 
     graph.clear();
+    nodeIDs.clear();
+
     audioInputNode = graph.addNode (std::make_unique<juce::AudioProcessorGraph::AudioGraphIOProcessor>
         (juce::AudioProcessorGraph::AudioGraphIOProcessor::audioInputNode));
     audioOutputNode = graph.addNode (std::make_unique<juce::AudioProcessorGraph::AudioGraphIOProcessor>
