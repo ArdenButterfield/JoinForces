@@ -3,10 +3,9 @@
 //
 
 #include "SliderColumn.h"
+#include "JoinForcesLookFeel.h"
 
-#include "public.sdk/source/vst/vstparameters.h"
-
-SliderColumn::SliderColumn(MappingCenter& mc, MappingCenter::MappingPoint& mp)
+SliderColumn::SliderColumn(MappingCenter& mc, MappingPoint& mp)
 : editable(false), mappingCenter(mc), mappingPoint(mp), positionVisualizer(mappingPoint.position) {
     addAndMakeVisible(positionVisualizer);
     rebuildParameterPanels();
@@ -17,11 +16,15 @@ SliderColumn::~SliderColumn() {
 }
 
 void SliderColumn::resized() {
-    Component::resized();
+    int y = 0;
+    for (auto& panel : parameterPanels) {
+        panel->setTopLeftPosition(0, y);
+        y += panel->getHeight();
+    }
 }
 
 void SliderColumn::paint(juce::Graphics &g) {
-    Component::paint(g);
+    g.fillAll(juce::Colours::darkgreen);
 }
 
 void SliderColumn::setEditable(bool) {
@@ -46,5 +49,6 @@ void SliderColumn::rebuildParameterPanels() {
     for (auto& p : parameterPanels) {
         addAndMakeVisible(p.get());
     }
-    resized();
+
+    setSize(JoinForcesLookFeel::getColumnWidth(), JoinForcesLookFeel::getColumnRequiredHeight(mappingCenter));
 }

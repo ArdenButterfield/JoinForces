@@ -4,6 +4,8 @@
 #include "gui/MappingsPanel.h"
 #include "gui/PositionVisualizer.h"
 
+#include "melatonin_inspector/melatonin_inspector.h"
+
 //==============================================================================
 class PluginEditor : public juce::AudioProcessorEditor
 {
@@ -24,6 +26,9 @@ private:
     juce::TextButton addPluginButton;
     juce::Viewport mappingViewport;
     juce::TextButton createMappingButton;
+
+    std::unique_ptr<melatonin::Inspector> inspector;
+    juce::TextButton inspectButton { "Inspect the UI" };
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (PluginEditor)
 };

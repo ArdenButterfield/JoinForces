@@ -21,10 +21,30 @@ void MappingCenter::createMappingAtCurrentState() {
         PluginParameterSet parameterSet = {*processor, {}};
         for (auto& parameter : processor->getParameters()) {
             if (parameter->isAutomatable()) {
-                parameterSet.parameterValues.push_back(parameter->getValue());
+                parameterSet.parameters.push_back({parameter->getValue(), *parameter});
             }
         }
         newMapping.pluginParameters.push_back(parameterSet);
+    }
+}
+
+void MappingCenter::processBlock() {
+    currentMapping.position = ffInterface.getCurrentPosition();
+
+    calculateCurrentMapping();
+
+    for (auto& plugin : currentMapping.pluginParameters) {
+        for (auto& param : plugin.parameters) {
+            param.parameter.setValue(param.value);
+        }
+    }
+}
+
+void MappingCenter::calculateCurrentMapping() {
+    for (auto& plugin : currentMapping.pluginParameters) {
+        for (auto& param : plugin.parameters) {
+            param.value = 0.5; // TODO: actual algorithm!
+        }
     }
 }
 

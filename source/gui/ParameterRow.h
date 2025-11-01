@@ -14,12 +14,12 @@
 
 class ParameterRow : public juce::Component {
 public:
-    ParameterRow(MappingCenter::Parameter&);
+    ParameterRow(Parameter&);
     ~ParameterRow() override;
     void paint(juce::Graphics &g) override;
     void resized() override;
 private:
-    MappingCenter::Parameter& parameter;
+    Parameter& parameter;
     CurrentParameterValueSlider currentValueSlider;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(ParameterRow)

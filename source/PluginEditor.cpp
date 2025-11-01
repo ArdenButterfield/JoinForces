@@ -4,7 +4,18 @@
 PluginEditor::PluginEditor (PluginProcessor& p)
     : AudioProcessorEditor (&p), processorRef (p), mappingsPanel (*p.getMappingCenter())
 {
-    juce::ignoreUnused (processorRef);
+    addAndMakeVisible (inspectButton);
+
+    // this chunk of code instantiates and opens the melatonin inspector
+    inspectButton.onClick = [&] {
+        if (!inspector)
+        {
+            inspector = std::make_unique<melatonin::Inspector> (*this);
+            inspector->onClose = [this]() { inspector.reset(); };
+        }
+
+        inspector->setVisible (true);
+    };
 
     addAndMakeVisible(mappingViewport);
     mappingViewport.setViewedComponent(&mappingsPanel, false);
@@ -61,6 +72,7 @@ void PluginEditor::paint (juce::Graphics& g)
 
 void PluginEditor::resized()
 {
+    inspectButton.setBounds({0,0,150, 40});
     auto usableArea = getLocalBounds().withSizeKeepingCentre(getWidth() - 20, getHeight() - 20);
 
     createMappingButton.setBounds(usableArea.withHeight(30).withWidth(150));

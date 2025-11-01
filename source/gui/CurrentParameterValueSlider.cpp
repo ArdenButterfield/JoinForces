@@ -4,7 +4,7 @@
 
 #include "CurrentParameterValueSlider.h"
 
-CurrentParameterValueSlider::CurrentParameterValueSlider(MappingCenter::Parameter& p) : parameter(p) {
+CurrentParameterValueSlider::CurrentParameterValueSlider(Parameter& p) : parameter(p) {
     setSliderStyle(juce::Slider::LinearHorizontal);
     setTextBoxStyle(juce::Slider::TextBoxRight, true, 100, 40);
     setRange(0, 1, 1.0 / (parameter.parameter.getNumSteps() - 1.0));
@@ -32,5 +32,5 @@ void CurrentParameterValueSlider::resized() {
 }
 
 void CurrentParameterValueSlider::valueChanged() {
-    parameter.value = getValue();
+    parameter.value = static_cast<float>(getValue());
 }

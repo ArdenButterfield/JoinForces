@@ -9,8 +9,17 @@
 
 int JoinForcesLookFeel::getColumnRequiredHeight(MappingCenter &mappingCenter) {
     int h = 0;
-    for (auto& id : mappingCenter.group.getNodes()) {
-        auto processor = mappingCenter.group.getAudioProcessorGraph().getNodeForId(id)->getProcessor();
-        for (auto& )
+    for (auto& pps : mappingCenter.getCurrentMapping().pluginParameters) {
+        h += getProcessorRequiredHeight(pps);
+        h += getDefaultMargin();
     }
+    return h;
+}
+
+int JoinForcesLookFeel::getMappingPanelRequiredWidth(MappingCenter &mappingCenter) {
+    return getColumnWidth() * (mappingCenter.getMappings().size() + 1) + getDefaultMargin();
+}
+
+int JoinForcesLookFeel::getProcessorRequiredHeight(const PluginParameterSet& pluginParameterSet) {
+    return pluginParameterSet.parameters.size() * getParameterRowHeight();
 }

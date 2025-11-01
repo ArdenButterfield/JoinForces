@@ -12,7 +12,7 @@
 
 class CurrentParameterValueSlider : public juce::Slider, public juce::Timer {
 public:
-    explicit CurrentParameterValueSlider(MappingCenter::Parameter& p);
+    explicit CurrentParameterValueSlider(Parameter& p);
     ~CurrentParameterValueSlider() override;
     double getValueFromText(const juce::String &text) override;
     juce::String getTextFromValue(double value) override;
@@ -20,7 +20,7 @@ public:
     void resized() override;
     void valueChanged() override;
 private:
-    MappingCenter::Parameter& parameter;
+    Parameter& parameter;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(CurrentParameterValueSlider);
 };

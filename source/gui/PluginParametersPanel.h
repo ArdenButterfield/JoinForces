@@ -15,16 +15,14 @@
 
 class PluginParametersPanel : public juce::Component {
 public:
-    PluginParametersPanel(MappingCenter::PluginParameterSet&);
+    PluginParametersPanel(PluginParameterSet&);
     ~PluginParametersPanel() override;
     void resized() override;
     void paint(juce::Graphics &g) override;
     void updateDisplay();
-    int getDesiredHeight() const;
 private:
-    MappingCenter::PluginParameterSet& parameterSet;
+    PluginParameterSet& parameterSet;
 
-    int parameterRowHeight = 30;
     juce::TextButton openEditorButton;
     std::vector<std::unique_ptr<ParameterRow>> parameterRows;
     const juce::AudioProcessorGraph::NodeID nodeID;

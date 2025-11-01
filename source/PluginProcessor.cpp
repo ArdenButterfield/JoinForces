@@ -138,6 +138,8 @@ void PluginProcessor::processBlock (juce::AudioBuffer<float>& buffer,
     for (auto i = totalNumInputChannels; i < totalNumOutputChannels; ++i)
         buffer.clear (i, 0, buffer.getNumSamples());
 
+    mappingCenter.processBlock();
+
     pluginGroup.processBlock(buffer, midiMessages);
 }
 

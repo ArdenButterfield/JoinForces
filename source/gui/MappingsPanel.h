@@ -5,26 +5,25 @@
 #ifndef JOINFORCES_MAPPINGSPANEL_H
 #define JOINFORCES_MAPPINGSPANEL_H
 
-#include "PluginParametersPanel.h"
 #include "juce_gui_basics/juce_gui_basics.h"
-#include "MappingPointParametersPanel.h"
-#include "CurrentStateColumn.h"
 
 #include <vector>
 #include <memory>
 
 class MappingCenter;
+class SliderColumn;
 
-class MappingsPanel : public juce::Component {
+class MappingsPanel : public juce::Component, public juce::Timer {
 public:
     explicit MappingsPanel(MappingCenter&);
     ~MappingsPanel() override;
     void paint(juce::Graphics &g) override;
     void resized() override;
 private:
-    std::unique_ptr<CurrentStateColumn> currentStateColumn;
-    std::vector<std::unique_ptr<MappingPointParametersPanel>> mappingPointPanels;
-    PluginGroup& group;
+    void timerCallback() override;
+    std::unique_ptr<SliderColumn> currentColumn;
+    std::vector<std::unique_ptr<SliderColumn>> mappingPointColumns;
+    MappingCenter& mappingCenter;
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(MappingsPanel)
 };
 

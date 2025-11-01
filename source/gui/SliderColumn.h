@@ -16,7 +16,7 @@
 
 class SliderColumn : public juce::Component, public juce::Timer {
 public:
-    SliderColumn(MappingCenter&, MappingCenter::MappingPoint&);
+    SliderColumn(MappingCenter&, MappingPoint&);
     ~SliderColumn();
     void resized() override;
     void paint(juce::Graphics &g) override;
@@ -26,7 +26,7 @@ private:
     void rebuildParameterPanels();
     bool editable;
     MappingCenter& mappingCenter;
-    MappingCenter::MappingPoint& mappingPoint;
+    MappingPoint& mappingPoint;
     PositionVisualizer positionVisualizer;
     std::vector<std::unique_ptr<PluginParametersPanel>> parameterPanels;
 };

@@ -13,35 +13,42 @@
 class PluginGroup;
 class ForceFeedbackInterface;
 
+struct Parameter {
+    float value;
+    juce::AudioProcessorParameter& parameter;
+};
+
+struct PluginParameterSet {
+    juce::AudioProcessor& processor;
+    std::vector<Parameter> parameters;
+};
+
+struct MappingPoint {
+    juce::Vector3D<float> position;
+    std::vector<PluginParameterSet> pluginParameters;
+};
+
 class MappingCenter {
 public:
-
-    struct Parameter {
-        float value;
-        juce::AudioProcessorParameter& parameter;
-    };
-
-    struct PluginParameterSet {
-        juce::AudioProcessor& processor;
-        std::vector<Parameter> parameters;
-    };
-
-    struct MappingPoint {
-        juce::Vector3D<float> position;
-        std::vector<PluginParameterSet> pluginParameters;
-    };
-
     MappingCenter(PluginGroup& group, ForceFeedbackInterface& ffInterface);
     ~MappingCenter();
     void createMappingAtCurrentState();
-    const std::vector<MappingPoint>& getMappings() {
+    std::vector<MappingPoint>& getMappings() {
         return mappings;
+    }
+
+    MappingPoint& getCurrentMapping() {
+        return currentMapping;
     }
 
     PluginGroup& group;
     ForceFeedbackInterface& ffInterface;
+
+    void processBlock();
 private:
     std::vector<MappingPoint> mappings;
+    MappingPoint currentMapping;
+    void calculateCurrentMapping();
 };
 
 

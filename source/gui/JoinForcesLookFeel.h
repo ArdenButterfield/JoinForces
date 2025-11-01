@@ -8,10 +8,14 @@
 #include "juce_gui_basics/juce_gui_basics.h"
 
 class MappingCenter;
+struct PluginParameterSet;
 
 class JoinForcesLookFeel : juce::LookAndFeel_V4 {
 public:
     static int getColumnRequiredHeight(MappingCenter& mappingCenter);
+    static int getMappingPanelRequiredWidth(MappingCenter& mappingCenter);
+    static int getProcessorRequiredHeight(const PluginParameterSet&);
+
     static int getDefaultMargin() {
         return 10;
     }
@@ -26,6 +30,10 @@ public:
 
     static int getParameterRowWidth() {
         return getSliderWidth() + 100;
+    }
+
+    static int getColumnWidth() {
+        return getParameterRowWidth() + getDefaultMargin() * 2;
     }
 
     static int getParameterRowHeight() {

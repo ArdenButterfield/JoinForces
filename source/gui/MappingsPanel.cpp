@@ -2,13 +2,18 @@
 // Created by Arden on 2025-10-12.
 //
 
-#include "MappingsPanel.h"
 #include "../MappingCenter.h"
+#include "MappingsPanel.h"
+#include "SliderColumn.h"
 
-MappingsPanel::MappingsPanel(MappingCenter& mc) : group(mc.group) {
-    currentStateColumn = std::make_unique<CurrentStateColumn>(mc);
-    addAndMakeVisible(currentStateColumn.get());
-    setSize(400,400);
+#include "JoinForcesLookFeel.h"
+
+
+MappingsPanel::MappingsPanel(MappingCenter& mc) : mappingCenter(mc) {
+    currentColumn = std::make_unique<SliderColumn>(mappingCenter, mappingCenter.getCurrentMapping());
+    addAndMakeVisible(currentColumn.get());
+    setSize(JoinForcesLookFeel::getMappingPanelRequiredWidth(mappingCenter),
+            JoinForcesLookFeel::getColumnRequiredHeight(mappingCenter));
 }
 
 MappingsPanel::~MappingsPanel() {
@@ -22,5 +27,24 @@ void MappingsPanel::paint(juce::Graphics &g) {
 }
 
 void MappingsPanel::resized() {
-    currentStateColumn->setBounds(getLocalBounds().withTrimmedLeft(10).withTrimmedTop(10).withTrimmedBottom(10).withWidth(100));
+    currentColumn->setTopLeftPosition(0,0);
+    for (int i = 0; i < mappingPointColumns.size(); i++) {
+        mappingPointColumns[i]->setTopLeftPosition(JoinForcesLookFeel::getColumnWidth() * (i + 1), 0);
+    }
+}
+
+void MappingsPanel::timerCallback() {
+    if (mappingCenter.getMappings().size() != mappingPointColumns.size()) {
+        mappingPointColumns.clear();
+
+        for (auto& mapping: mappingCenter.getMappings()) {
+            mappingPointColumns.push_back(std::make_unique<SliderColumn>(mappingCenter, mapping));
+        }
+
+        for (auto& column : mappingPointColumns) {
+            addAndMakeVisible(column.get());
+        }
+        setSize(JoinForcesLookFeel::getMappingPanelRequiredWidth(mappingCenter),
+            JoinForcesLookFeel::getColumnRequiredHeight(mappingCenter));
+    }
 }
