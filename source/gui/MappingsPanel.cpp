@@ -14,6 +14,7 @@ MappingsPanel::MappingsPanel(MappingCenter& mc) : mappingCenter(mc) {
     addAndMakeVisible(currentColumn.get());
     setSize(JoinForcesLookFeel::getMappingPanelRequiredWidth(mappingCenter),
             JoinForcesLookFeel::getColumnRequiredHeight(mappingCenter));
+    startTimerHz(30);
 }
 
 MappingsPanel::~MappingsPanel() {
@@ -44,7 +45,8 @@ void MappingsPanel::timerCallback() {
         for (auto& column : mappingPointColumns) {
             addAndMakeVisible(column.get());
         }
-        setSize(JoinForcesLookFeel::getMappingPanelRequiredWidth(mappingCenter),
-            JoinForcesLookFeel::getColumnRequiredHeight(mappingCenter));
     }
+    setSize(JoinForcesLookFeel::getMappingPanelRequiredWidth(mappingCenter),
+        JoinForcesLookFeel::getColumnRequiredHeight(mappingCenter));
+
 }

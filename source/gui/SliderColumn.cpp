@@ -7,6 +7,7 @@
 
 SliderColumn::SliderColumn(MappingCenter& mc, MappingPoint& mp)
 : editable(false), mappingCenter(mc), mappingPoint(mp), positionVisualizer(mappingPoint.position) {
+    std::cout << &mappingPoint << " mp address\n";
     addAndMakeVisible(positionVisualizer);
     rebuildParameterPanels();
     startTimerHz(60);
@@ -17,6 +18,8 @@ SliderColumn::~SliderColumn() {
 
 void SliderColumn::resized() {
     int y = 0;
+    positionVisualizer.setTopLeftPosition(0,0);
+    y += positionVisualizer.getHeight();
     for (auto& panel : parameterPanels) {
         panel->setTopLeftPosition(0, y);
         y += panel->getHeight();
@@ -42,8 +45,8 @@ void SliderColumn::rebuildParameterPanels() {
 
     parameterPanels.clear();
 
-    for (int i = 0; i < mappingPoint.pluginParameters.size(); i++) {
-        parameterPanels.emplace_back(std::make_unique<PluginParametersPanel>(mappingPoint.pluginParameters[i]));
+    for (auto& p : mappingPoint.pluginParameters) {
+        parameterPanels.emplace_back(std::make_unique<PluginParametersPanel>(p));
     }
 
     for (auto& p : parameterPanels) {

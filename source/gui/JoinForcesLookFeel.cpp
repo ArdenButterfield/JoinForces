@@ -5,10 +5,9 @@
 #include "JoinForcesLookFeel.h"
 
 #include "../MappingCenter.h"
-#include "../PluginGroup.h"
 
 int JoinForcesLookFeel::getColumnRequiredHeight(MappingCenter &mappingCenter) {
-    int h = 0;
+    int h = getPositionVizHeight();
     for (auto& pps : mappingCenter.getCurrentMapping().pluginParameters) {
         h += getProcessorRequiredHeight(pps);
         h += getDefaultMargin();

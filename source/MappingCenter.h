@@ -5,12 +5,14 @@
 #ifndef JOINFORCES_MAPPINGCENTER_H
 #define JOINFORCES_MAPPINGCENTER_H
 
+#include <list>
 #include <vector>
 
 #include "juce_audio_processors/juce_audio_processors.h"
 #include "juce_opengl/juce_opengl.h"
 
-class PluginGroup;
+#include "PluginGroup.h"
+
 class ForceFeedbackInterface;
 
 struct Parameter {
@@ -25,10 +27,10 @@ struct PluginParameterSet {
 
 struct MappingPoint {
     juce::Vector3D<float> position;
-    std::vector<PluginParameterSet> pluginParameters;
+    std::list<PluginParameterSet> pluginParameters;
 };
 
-class MappingCenter {
+class MappingCenter : public PluginGroup::Listener {
 public:
     MappingCenter(PluginGroup& group, ForceFeedbackInterface& ffInterface);
     ~MappingCenter();
@@ -45,7 +47,13 @@ public:
     ForceFeedbackInterface& ffInterface;
 
     void processBlock();
+
 private:
+    void groupUpdated(const PluginGroup &group) override;
+
+    void insertInto(MappingPoint& mapping);
+    void removeFrom(MappingPoint& mapping);
+
     std::vector<MappingPoint> mappings;
     MappingPoint currentMapping;
     void calculateCurrentMapping();

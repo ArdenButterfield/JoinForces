@@ -3,8 +3,7 @@
 //
 
 #include "PositionVisualizer.h"
-
-#include "../ForceFeedbackInterface.h"
+#include "JoinForcesLookFeel.h"
 
 PositionVisualizer::PositionVisualizer(juce::Vector3D<float>& p) : position(p) {
     startTimerHz(60);
@@ -16,6 +15,8 @@ PositionVisualizer::PositionVisualizer(juce::Vector3D<float>& p) : position(p) {
         slider.addListener(this);
         addAndMakeVisible(slider);
     }
+
+    setSize(JoinForcesLookFeel::getParameterRowWidth(), JoinForcesLookFeel::getPositionVizHeight());
 }
 
 PositionVisualizer::~PositionVisualizer() = default;
