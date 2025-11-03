@@ -16,9 +16,9 @@ int JoinForcesLookFeel::getColumnRequiredHeight(MappingCenter &mappingCenter) {
 }
 
 int JoinForcesLookFeel::getMappingPanelRequiredWidth(MappingCenter &mappingCenter) {
-    return getColumnWidth() * (mappingCenter.getMappings().size() + 1) + getDefaultMargin();
+    return getColumnWidth() * (mappingCenter.getMappings().size() + 1) + getDefaultMargin() + getNamesColumnWidth();
 }
 
 int JoinForcesLookFeel::getProcessorRequiredHeight(const PluginParameterSet& pluginParameterSet) {
-    return pluginParameterSet.parameters.size() * getParameterRowHeight();
+    return pluginParameterSet.parameters.size() * getParameterRowHeight() + getDefaultMargin();
 }

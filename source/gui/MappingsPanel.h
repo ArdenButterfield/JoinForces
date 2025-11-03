@@ -12,6 +12,7 @@
 
 class MappingCenter;
 class SliderColumn;
+class ParameterNamesColumn;
 
 class MappingsPanel : public juce::Component, public juce::Timer {
 public:
@@ -23,6 +24,7 @@ private:
     void timerCallback() override;
     std::unique_ptr<SliderColumn> currentColumn;
     std::vector<std::unique_ptr<SliderColumn>> mappingPointColumns;
+    std::unique_ptr<ParameterNamesColumn> parameterNamesColumn;
     MappingCenter& mappingCenter;
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(MappingsPanel)
 };

@@ -16,6 +16,10 @@ public:
     static int getMappingPanelRequiredWidth(MappingCenter& mappingCenter);
     static int getProcessorRequiredHeight(const PluginParameterSet&);
 
+    static int getNamesColumnWidth() {
+        return 200;
+    }
+
     static int getDefaultMargin() {
         return 10;
     }
@@ -25,11 +29,11 @@ public:
     }
 
     static int getSliderWidth() {
-        return 140;
+        return 200;
     }
 
     static int getParameterRowWidth() {
-        return getSliderWidth() + 100;
+        return getSliderWidth();
     }
 
     static int getColumnWidth() {
@@ -37,7 +41,7 @@ public:
     }
 
     static int getParameterRowHeight() {
-        return 15;
+        return 25;
     }
 };
 

@@ -5,6 +5,7 @@
 #include "../MappingCenter.h"
 #include "MappingsPanel.h"
 #include "SliderColumn.h"
+#include "ParameterNamesColumn.h"
 
 #include "JoinForcesLookFeel.h"
 
@@ -12,6 +13,10 @@
 MappingsPanel::MappingsPanel(MappingCenter& mc) : mappingCenter(mc) {
     currentColumn = std::make_unique<SliderColumn>(mappingCenter, mappingCenter.getCurrentMapping(), 0);
     addAndMakeVisible(currentColumn.get());
+
+    parameterNamesColumn = std::make_unique<ParameterNamesColumn>(mappingCenter);
+    addAndMakeVisible(parameterNamesColumn.get());
+
     setSize(JoinForcesLookFeel::getMappingPanelRequiredWidth(mappingCenter),
             JoinForcesLookFeel::getColumnRequiredHeight(mappingCenter));
     startTimerHz(30);
@@ -28,9 +33,14 @@ void MappingsPanel::paint(juce::Graphics &g) {
 }
 
 void MappingsPanel::resized() {
-    currentColumn->setTopLeftPosition(0,0);
+    int x = 0;
+    parameterNamesColumn->setTopLeftPosition(x,0);
+    x += JoinForcesLookFeel::getNamesColumnWidth();
+    currentColumn->setTopLeftPosition(x,0);
+    x += JoinForcesLookFeel::getColumnWidth();
     for (int i = 0; i < mappingPointColumns.size(); i++) {
-        mappingPointColumns[i]->setTopLeftPosition(JoinForcesLookFeel::getColumnWidth() * (i + 1), 0);
+        mappingPointColumns[i]->setTopLeftPosition(x, 0);
+        x += JoinForcesLookFeel::getColumnWidth();
     }
 }
 
