@@ -17,6 +17,7 @@ public:
     void paint (juce::Graphics&) override;
     void resized() override;
 
+    juce::TextButton createMappingButton;
 private:
     std::unique_ptr<juce::FileChooser> fileChooser;
     // This reference is provided as a quick way for your editor to
@@ -25,7 +26,6 @@ private:
     MappingsPanel mappingsPanel;
     juce::TextButton addPluginButton;
     juce::Viewport mappingViewport;
-    juce::TextButton createMappingButton;
 
     std::unique_ptr<melatonin::Inspector> inspector;
     juce::TextButton inspectButton { "Inspect the UI" };

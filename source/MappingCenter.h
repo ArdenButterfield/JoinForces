@@ -35,7 +35,7 @@ public:
     MappingCenter(PluginGroup& group, ForceFeedbackInterface& ffInterface);
     ~MappingCenter();
     void createMappingAtCurrentState();
-    std::vector<MappingPoint>& getMappings() {
+    std::list<MappingPoint>& getMappings() {
         return mappings;
     }
 
@@ -54,9 +54,11 @@ private:
     void insertInto(MappingPoint& mapping);
     void removeFrom(MappingPoint& mapping);
 
-    std::vector<MappingPoint> mappings;
+    std::list<MappingPoint> mappings;
     MappingPoint currentMapping;
     void calculateCurrentMapping();
+
+    juce::CriticalSection criticalSection;
 };
 
 

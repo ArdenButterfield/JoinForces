@@ -16,13 +16,14 @@
 
 class SliderColumn : public juce::Component, public juce::Timer {
 public:
-    SliderColumn(MappingCenter&, MappingPoint&);
+    SliderColumn(MappingCenter&, MappingPoint&, int columnIndex);
     ~SliderColumn();
     void resized() override;
     void paint(juce::Graphics &g) override;
     void setEditable(bool);
     void timerCallback() override;
 private:
+    int columnIndex;
     void rebuildParameterPanels();
     bool editable;
     MappingCenter& mappingCenter;

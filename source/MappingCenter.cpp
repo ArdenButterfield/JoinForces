@@ -16,6 +16,7 @@ MappingCenter::~MappingCenter() {
 }
 
 void MappingCenter::createMappingAtCurrentState() {
+    criticalSection.enter();
     auto newMapping = MappingPoint();
     newMapping.position = ffInterface.getCurrentPosition();
     for (auto nodeId : group.getNodes()) {
@@ -29,6 +30,7 @@ void MappingCenter::createMappingAtCurrentState() {
         newMapping.pluginParameters.push_back(parameterSet);
     }
     mappings.push_back(newMapping);
+    criticalSection.exit();
 }
 
 void MappingCenter::processBlock() {
@@ -75,6 +77,7 @@ void MappingCenter::groupUpdated(const PluginGroup &g) {
 }
 
 void MappingCenter::insertInto(MappingPoint &mapping) {
+    criticalSection.enter();
     auto it = mapping.pluginParameters.begin();
     for (auto nodeId : group.getNodes()) {
         auto processor = group.getAudioProcessorGraph().getNodeForId(nodeId)->getProcessor();
@@ -92,6 +95,7 @@ void MappingCenter::insertInto(MappingPoint &mapping) {
 }
 
 void MappingCenter::removeFrom(MappingPoint &mapping) {
+    criticalSection.enter();
     auto it = mapping.pluginParameters.begin();
     for (auto nodeId : group.getNodes()) {
         auto processor = group.getAudioProcessorGraph().getNodeForId(nodeId)->getProcessor();
@@ -101,6 +105,7 @@ void MappingCenter::removeFrom(MappingPoint &mapping) {
             ++it;
         }
     }
+    criticalSection.exit();
 }
 
 void MappingCenter::calculateCurrentMapping() {

@@ -10,7 +10,7 @@
 
 
 MappingsPanel::MappingsPanel(MappingCenter& mc) : mappingCenter(mc) {
-    currentColumn = std::make_unique<SliderColumn>(mappingCenter, mappingCenter.getCurrentMapping());
+    currentColumn = std::make_unique<SliderColumn>(mappingCenter, mappingCenter.getCurrentMapping(), 0);
     addAndMakeVisible(currentColumn.get());
     setSize(JoinForcesLookFeel::getMappingPanelRequiredWidth(mappingCenter),
             JoinForcesLookFeel::getColumnRequiredHeight(mappingCenter));
@@ -38,8 +38,10 @@ void MappingsPanel::timerCallback() {
     if (mappingCenter.getMappings().size() != mappingPointColumns.size()) {
         mappingPointColumns.clear();
 
+        int i = 1;
         for (auto& mapping: mappingCenter.getMappings()) {
-            mappingPointColumns.push_back(std::make_unique<SliderColumn>(mappingCenter, mapping));
+            mappingPointColumns.push_back(std::make_unique<SliderColumn>(mappingCenter, mapping, i));
+            ++i;
         }
 
         for (auto& column : mappingPointColumns) {

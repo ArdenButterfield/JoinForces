@@ -1,9 +1,11 @@
 #include "helpers/test_helpers.h"
 #include <PluginGroup.h>
 #include <PluginProcessor.h>
+#include <PluginEditor.h>
 #include <catch2/catch_test_macros.hpp>
 #include <catch2/matchers/catch_matchers_string.hpp>
 
+#define RUN_ON_MY_COMPUTER
 
 TEST_CASE ("one is equal to one", "[dummy]")
 {
@@ -87,6 +89,20 @@ TEST_CASE("Audio unchanged with no plugins loaded", "[audio unchanged]") {
     testPlugin.processBlock(buffer, midiBuffer);
     for (int i = 0; i < buffer.getNumSamples(); ++i) {
         REQUIRE (buffer.getSample(0, i) == 0.5);
+    }
+}
+
+TEST_CASE("Mappings", "[mappings]") {
+    PluginProcessor testPlugin;
+    testPlugin.prepareToPlay(44100, 1024);
+    auto editor = static_cast<PluginEditor*>(testPlugin.createEditor());
+    for (int iter = 0; iter < 20; ++iter) {
+        auto buffer = juce::AudioBuffer<float>(2, 1024);
+        auto midiBuffer = juce::MidiBuffer();
+        for (int i = 0; i < 2000; ++i) {
+            testPlugin.processBlock(buffer, midiBuffer);
+        }
+        editor->createMappingButton.triggerClick();
     }
 }
 

@@ -5,9 +5,8 @@
 #include "SliderColumn.h"
 #include "JoinForcesLookFeel.h"
 
-SliderColumn::SliderColumn(MappingCenter& mc, MappingPoint& mp)
-: editable(false), mappingCenter(mc), mappingPoint(mp), positionVisualizer(mappingPoint.position) {
-    std::cout << &mappingPoint << " mp address\n";
+SliderColumn::SliderColumn(MappingCenter& mc, MappingPoint& mp, int ci)
+: editable(false), mappingCenter(mc), mappingPoint(mp), positionVisualizer(mappingPoint.position), columnIndex(ci) {
     addAndMakeVisible(positionVisualizer);
     rebuildParameterPanels();
     startTimerHz(60);
