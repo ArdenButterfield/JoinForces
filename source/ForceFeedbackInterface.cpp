@@ -4,7 +4,7 @@
 
 #include "ForceFeedbackInterface.h"
 
-ForceFeedbackInterface::ForceFeedbackInterface() {
+ForceFeedbackInterface::ForceFeedbackInterface() : initialized(false) {
 }
 
 ForceFeedbackInterface::~ForceFeedbackInterface() {
@@ -25,6 +25,8 @@ void ForceFeedbackInterface::init() {
 
     hdEnable(HD_FORCE_OUTPUT);
     hdStartScheduler();
+
+    initialized = true;
 
 }
 
@@ -65,6 +67,10 @@ HDCallbackCode ForceFeedbackInterface::callback() {
     hdEndFrame(hHD);
 
     return HD_CALLBACK_CONTINUE;
+}
+
+bool ForceFeedbackInterface::isInitialized() {
+    return initialized;
 }
 
 HDCallbackCode ffCallback(void *data) {

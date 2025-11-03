@@ -34,7 +34,9 @@ void MappingCenter::createMappingAtCurrentState() {
 }
 
 void MappingCenter::processBlock() {
-    currentMapping.position = ffInterface.getCurrentPosition();
+    if (ffInterface.isInitialized()) {
+        currentMapping.position = ffInterface.getCurrentPosition();
+    }
 
     calculateCurrentMapping();
 

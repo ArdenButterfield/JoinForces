@@ -22,7 +22,10 @@ public:
     void deInit();
     HDCallbackCode callback();
 
+    bool isInitialized();
+
 private:
+    bool initialized;
     juce::Vector3D<float> position;
     HHD ghHD = HD_INVALID_HANDLE;
     HDSchedulerHandle schedulerHandle;
