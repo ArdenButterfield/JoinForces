@@ -33,7 +33,7 @@ struct MappingPoint {
 
 class MappingCenter {
 public:
-    MappingCenter(juce::AudioProcessor::BusesLayout layout, ForceFeedbackInterface& ffInterface);
+    MappingCenter(const juce::AudioProcessor::BusesLayout &layout, ForceFeedbackInterface& ffInterface);
     ~MappingCenter();
     void createMappingAtCurrentState();
     std::list<MappingPoint>& getMappings() {
@@ -52,6 +52,10 @@ public:
     int addPlugin(const juce::File& file, juce::String& errorMessage);
 
     PluginGroup pluginGroup;
+
+    void exportToXml(juce::XmlElement& xml);
+    void importFromXml(const juce::XmlElement& xml);
+
 private:
     void insertInto(MappingPoint& mapping, const juce::File& file);
     void removeFrom(MappingPoint& mapping);
@@ -61,8 +65,8 @@ private:
     void calculateCurrentMapping();
 
     juce::CriticalSection criticalSection;
-    void exportToXml(juce::XmlElement& xml);
-    void importFromXml(const juce::XmlElement& xml);
+    juce::AudioProcessor::BusesLayout busesLayout;
+    juce::AudioProcessor* getNthProcessor(int n);
 };
 
 

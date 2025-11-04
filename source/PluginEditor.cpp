@@ -26,6 +26,9 @@ PluginEditor::PluginEditor (PluginProcessor& p)
     addAndMakeVisible(createMappingButton);
     createMappingButton.setButtonText("Create mapping");
 
+    addAndMakeVisible(importFromClipboardButton);
+    addAndMakeVisible(exportToClipboardButton);
+
     // this chunk of code instantiates and opens the melatonin inspector
     addPluginButton.onClick = [&] {
         fileChooser = std::make_unique<juce::FileChooser> ("Select an audio plugin...",
@@ -47,6 +50,19 @@ PluginEditor::PluginEditor (PluginProcessor& p)
     };
     createMappingButton.onClick = [&] {
         processorRef.getMappingCenter()->createMappingAtCurrentState();
+    };
+
+    importFromClipboardButton.onClick = [&] {
+        auto element = juce::XmlDocument::parse(juce::SystemClipboard::getTextFromClipboard());
+        if (element.get() != nullptr) {
+            processorRef.getMappingCenter()->importFromXml(*element);
+        }
+    };
+
+    exportToClipboardButton.onClick = [&] {
+        auto element = juce::XmlElement("state");
+        processorRef.getMappingCenter()->exportToXml(element);
+        juce::SystemClipboard::copyTextToClipboard(element.toString());
     };
 
     // Make sure that before the constructor has finished, you've set the
@@ -73,7 +89,9 @@ void PluginEditor::paint (juce::Graphics& g)
 void PluginEditor::resized()
 {
     inspectButton.setBounds({0,0,150, 40});
-    auto usableArea = getLocalBounds().withSizeKeepingCentre(getWidth() - 20, getHeight() - 20);
+    importFromClipboardButton.setBounds(inspectButton.getBounds().withX(inspectButton.getRight() + 10));
+    exportToClipboardButton.setBounds(importFromClipboardButton.getBounds().withX(importFromClipboardButton.getRight() + 10));
+    auto usableArea = getLocalBounds().withSizeKeepingCentre(getWidth() - 20, getHeight() - 20).withTop(inspectButton.getBottom() + 10);
 
     createMappingButton.setBounds(usableArea.withHeight(30).withWidth(150));
     addPluginButton.setBounds(createMappingButton.getBounds().withY(createMappingButton.getBottom() + 10));

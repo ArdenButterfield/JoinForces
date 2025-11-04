@@ -6,9 +6,6 @@
 
 #include <utility>
 
-void PluginGroup::Listener::groupUpdated(const PluginGroup &group) {
-}
-
 PluginGroup::PluginGroup(juce::AudioProcessor::BusesLayout layout) : hasChanged(false), busesLayout(std::move(layout)) {
     formatManager.addDefaultFormats();
     sampleRate = 0;
@@ -54,11 +51,12 @@ void PluginGroup::updateGraph() {
 }
 
 
-void PluginGroup::prepareToPlay(int inputChannels, int outputChannels, double _sampleRate, int _samplesPerBlockExpected) {
+void PluginGroup::prepareToPlay(int input, int output, double _sampleRate, int _samplesPerBlockExpected) {
     std::cout << "prepare to play group" << this << "\n";
     sampleRate = _sampleRate;
     samplesPerBlock = _samplesPerBlockExpected;
-
+    numInputChannels = input;
+    numOutputChannels = output;
     graph.clear();
     nodeIDs.clear();
 
@@ -84,7 +82,7 @@ void PluginGroup::prepareToPlay(int inputChannels, int outputChannels, double _s
     graph.addConnection (
         { { midiInputNode->nodeID, juce::AudioProcessorGraph::midiChannelIndex },
             { midiOutputNode->nodeID, juce::AudioProcessorGraph::midiChannelIndex } });
-    graph.setPlayConfigDetails(inputChannels, outputChannels, sampleRate, samplesPerBlock);
+    graph.setPlayConfigDetails(numInputChannels, numOutputChannels, sampleRate, samplesPerBlock);
     graph.prepareToPlay(sampleRate, samplesPerBlock);
 }
 
@@ -93,13 +91,13 @@ void PluginGroup::processBlock(juce::AudioBuffer<float> &buffer, juce::MidiBuffe
     graph.processBlock(buffer, m);
 }
 
-int PluginGroup::addPlugin(const juce::File& file, juce::String& errorMessage) {
+juce::AudioProcessor* PluginGroup::addPlugin(const juce::File& file, juce::String& errorMessage) {
     auto typesFound = juce::OwnedArray<juce::PluginDescription>();
     knownPlugins.scanAndAddDragAndDroppedFiles(formatManager, {file.getFullPathName()}, typesFound);
     auto description = knownPlugins.getTypeForFile(file.getFullPathName());
     if (description == nullptr) {
         errorMessage =  "Couldn't get plugin description: " + file.getFullPathName();
-        return 1;
+        return nullptr;
     }
 
     std::unique_ptr<juce::AudioProcessor> pluginInstance = formatManager.createPluginInstance(
@@ -111,22 +109,15 @@ int PluginGroup::addPlugin(const juce::File& file, juce::String& errorMessage) {
     nodeIDs.push_back(newNode->nodeID);
 
     hasChanged = true;
-    for (auto& listener : listeners) {
-        listener->groupUpdated(*this);
-    }
 
-    return 0;
+    return newNode->getProcessor();
 }
 
 void PluginGroup::releaseResources() {
     graph.releaseResources();
 }
 
-void PluginGroup::addListener(Listener* listener) {
-    listeners.insert(listener);
-}
-
-void PluginGroup::removeListener(Listener* listener) {
-    listeners.erase(listener);
+void PluginGroup::resetAllPlugins() {
+    prepareToPlay(numInputChannels, numOutputChannels, sampleRate, samplesPerBlock);
 }
 

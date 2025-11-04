@@ -9,7 +9,7 @@
 
 #include "PluginGroup.h"
 
-MappingCenter::MappingCenter(juce::AudioProcessor::BusesLayout layout, ForceFeedbackInterface &_interface) : pluginGroup(std::move(layout)), ffInterface(_interface) {
+MappingCenter::MappingCenter(const juce::AudioProcessor::BusesLayout &layout, ForceFeedbackInterface &_interface) : busesLayout(layout), pluginGroup(layout), ffInterface(_interface) {
 }
 
 MappingCenter::~MappingCenter() {
@@ -24,6 +24,7 @@ void MappingCenter::createMappingAtCurrentState() {
         for (auto& p : plugin.parameters) {
             parameterSet.parameters.push_back({p.value, p.parameter});
         }
+        newMapping.pluginParameters.push_back(parameterSet);
     }
     mappings.push_back(newMapping);
     criticalSection.exit();
@@ -48,13 +49,13 @@ void MappingCenter::processBlock(juce::AudioBuffer<float>& buffer,
 
 int MappingCenter::addPlugin(const juce::File &file, juce::String &errorMessage) {
     auto res = pluginGroup.addPlugin(file, errorMessage);
-    if (res == 0) {
+    if (res != nullptr) {
         insertInto(currentMapping, file);
         for (auto& mapping : mappings) {
             insertInto(mapping, file);
         }
     }
-    return res;
+    return res == nullptr;
 }
 
 /*
@@ -139,9 +140,10 @@ void MappingCenter::exportToXml(juce::XmlElement &xml) {
     auto currentPlugins = currentState->createNewChildElement("plugins");
     for (auto& plugin : currentMapping.pluginParameters) {
         auto p = currentPlugins->createNewChildElement("plugin");
+        p->setAttribute("path", plugin.file.getFullPathName());
         auto par = p->createNewChildElement("params");
         for (auto& param: plugin.parameters) {
-            par->setAttribute(juce::String(param.parameter.getParameterIndex()), param.value);
+            par->setAttribute("param_" + juce::String(param.parameter.getParameterIndex()), param.value);
         }
     }
     auto mapPositions = mapping->createNewChildElement("map-positions");
@@ -156,7 +158,7 @@ void MappingCenter::exportToXml(juce::XmlElement &xml) {
             auto p = mpPplugins->createNewChildElement("plugin");
             auto par = p->createNewChildElement("params");
             for (auto& param : plugin.parameters) {
-                par->setAttribute(juce::String(param.parameter.getParameterIndex()), param.value);
+                par->setAttribute("param_" + juce::String(param.parameter.getParameterIndex()), param.value);
             }
         }
     }
@@ -165,6 +167,110 @@ void MappingCenter::exportToXml(juce::XmlElement &xml) {
 void MappingCenter::importFromXml(const juce::XmlElement &xml) {
     criticalSection.enter();
 
+    auto mapping = xml.getChildByName("mapping");
+    if (mapping == nullptr) {
+        criticalSection.exit();
+        return;
+    }
+    auto currentState = mapping->getChildByName("current-state");
+    if (currentState == nullptr) {
+        criticalSection.exit();
+        return;
+    }
+    auto currentPosition = currentState->getChildByName("position");
+    if (currentPosition == nullptr) {
+        criticalSection.exit();
+        return;
+    }
+    currentMapping.position.x = currentPosition->getDoubleAttribute("x", 0);
+    currentMapping.position.x = currentPosition->getDoubleAttribute("x", 0);
+    currentMapping.position.x = currentPosition->getDoubleAttribute("x", 0);
+    pluginGroup.resetAllPlugins();
+    auto currentPlugins = currentState->getChildByName("plugins");
+    if (currentPlugins != nullptr) {
+        currentMapping.pluginParameters.clear();
+        for (auto* p : currentPlugins->getChildWithTagNameIterator("plugin")) {
+            auto path = p->getStringAttribute("path", "");
+            if (path != "") {
+                juce::String error = "";
+                auto processor = pluginGroup.addPlugin(path, error);
+                if (error != "" || processor == nullptr) {
+                    std::cout << error << std::endl;
+                    criticalSection.exit();
+                    return;
+                }
+                PluginParameterSet parameterSet = {*processor, path, {}};
+
+                auto par = p->getChildByName("params");
+                if (par == nullptr) {
+                    continue;
+                }
+                for (auto& param : processor->getParameters()) {
+                    if (param->isAutomatable()) {
+                        auto pValue = static_cast<float>(par->getDoubleAttribute("param_" + juce::String(param->getParameterIndex()), param->getDefaultValue()));
+                        parameterSet.parameters.push_back({pValue, *param});
+                    }
+                }
+                currentMapping.pluginParameters.push_back(parameterSet);
+            }
+        }
+    }
+    mappings.clear();
+    auto mapPositions = mapping->getChildByName("map-positions");
+    if (mapPositions == nullptr) {
+        criticalSection.exit();
+        return;
+    }
+    for (auto& mapPoint : mapPositions->getChildWithTagNameIterator("map-point")) {
+        auto newMapping = MappingPoint();
+        auto mapPosition = mapPoint->getChildByName("position");
+        if (mapPosition == nullptr) {
+            continue;
+        }
+        newMapping.position.x = mapPosition->getDoubleAttribute("x", 0);
+        newMapping.position.x = mapPosition->getDoubleAttribute("x", 0);
+        newMapping.position.x = mapPosition->getDoubleAttribute("x", 0);
+        auto plugs = mapPoint->getChildByName("plugins");
+        if (plugs != nullptr) {
+            newMapping.pluginParameters.clear();
+            int i = 0;
+            for (auto* p : plugs->getChildWithTagNameIterator("plugin")) {
+                auto path = p->getStringAttribute("path", "");
+                if (path != "") {
+                    auto processor = getNthProcessor(i);
+                    if (processor == nullptr) {
+                        continue;
+                    }
+                    PluginParameterSet parameterSet = {*processor, path, {}};
+                    ++i;
+
+                    auto par = p->getChildByName("params");
+                    if (par == nullptr) {
+                        continue;
+                    }
+                    for (auto& param : processor->getParameters()) {
+                        if (param->isAutomatable()) {
+                            auto pValue = static_cast<float>(par->getDoubleAttribute("param_" + juce::String(param->getParameterIndex()), param->getDefaultValue()));
+                            parameterSet.parameters.push_back({pValue, *param});
+                        }
+                    }
+                    newMapping.pluginParameters.push_back(parameterSet);
+                }
+            }
+        }
+        mappings.push_back(newMapping);
+    }
     criticalSection.exit();
+}
+
+juce::AudioProcessor* MappingCenter::getNthProcessor(int n) {
+    int i = 0;
+    for (auto plugin : currentMapping.pluginParameters) {
+        if (i == n) {
+            return &plugin.processor;
+        }
+        ++i;
+    }
+    return nullptr;
 }
 

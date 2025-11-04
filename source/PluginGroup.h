@@ -16,15 +16,9 @@
 
 class PluginGroup {
 public:
-    class Listener {
-    public:
-        virtual ~Listener() = default;
-        virtual void groupUpdated(const PluginGroup& group);
-    };
-
     explicit PluginGroup(juce::AudioProcessor::BusesLayout layout);
     ~PluginGroup();
-    int addPlugin(const juce::File& file, juce::String& errorMessage);
+    juce::AudioProcessor* addPlugin(const juce::File& file, juce::String& errorMessage);
     void prepareToPlay(int inputChannels, int outputChannels, double sampleRate, int samplesPerBlockExpected);
     void processBlock(juce::AudioBuffer<float>& buffer, juce::MidiBuffer& m);
     void releaseResources();
@@ -35,17 +29,17 @@ public:
         return graph;
     }
 
-    void addListener(Listener* listener);
-    void removeListener(Listener* listener);
+    void resetAllPlugins();
 
 private:
-    std::set<Listener*> listeners;
     bool hasChanged;
     void updateGraph();
     std::vector<juce::AudioProcessorGraph::NodeID> nodeIDs;
     std::unique_ptr<juce::AudioFormatReader> inputReader;
     juce::AudioPluginFormatManager formatManager;
     juce::KnownPluginList knownPlugins;
+    int numInputChannels;
+    int numOutputChannels;
     double sampleRate;
     int samplesPerBlock;
     juce::AudioProcessorGraph graph;
