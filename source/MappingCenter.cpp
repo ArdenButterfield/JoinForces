@@ -8,6 +8,7 @@
 #include "ForceFeedbackInterface.h"
 
 #include "PluginGroup.h"
+#include "juce_dsp/maths/juce_FastMathApproximations.h"
 
 MappingCenter::MappingCenter(const juce::AudioProcessor::BusesLayout &layout, ForceFeedbackInterface &_interface) : busesLayout(layout), pluginGroup(layout), ffInterface(_interface) {
 }
@@ -122,10 +123,61 @@ void MappingCenter::removeFrom(MappingPoint &mapping) {
     criticalSection.exit();
 }
 
+float MappingCenter::closeness(juce::Vector3D<float> a, juce::Vector3D<float> b) {
+    return
+        juce::dsp::FastMathApproximations::exp(-((a.x - b.x) * (a.x - b.x))) *
+        juce::dsp::FastMathApproximations::exp(-((a.y - b.y) * (a.y - b.y))) *
+        juce::dsp::FastMathApproximations::exp(-((a.z - b.z) * (a.z - b.z)));
+}
+
+
 void MappingCenter::calculateCurrentMapping() {
-    for (auto& plugin : currentMapping.pluginParameters) {
-        for (auto& param : plugin.parameters) {
-            param.value = 0.5; // TODO: actual algorithm!
+    std::vector<float> distances;
+    auto minDistance = 9999999.9f;
+    auto minIndex = -1;
+    for (auto& mapping : mappings) {
+        auto difference = mapping.position - currentMapping.position;
+        distances.push_back(difference.lengthSquared());
+        if (distances.back() < minDistance) {
+            minDistance = distances.back();
+            minIndex = distances.size() - 1;
+        }
+    }
+
+    std::vector<float> weights;
+    weights.resize(distances.size());
+
+    if (minDistance < 0.00001) {
+        for (int i = 0; i < distances.size(); i++) {
+            weights[i] = (i == minIndex) ? 1.0f : 0.0f;
+        }
+    } else {
+        auto weightSum = 0.0f;
+        for (int i = 0; i < distances.size(); i++) {
+            weights[i] = 1.f / distances[i];
+            weightSum += weights[i];
+        }
+        for (float& weight : weights) {
+            weight /= weightSum;
+        }
+    }
+
+    auto currentMappingIt = currentMapping.pluginParameters.begin();
+    std::vector<std::list<PluginParameterSet>::iterator> mappingPointIterators;
+    for (auto& mapping : mappings) {
+        mappingPointIterators.push_back(mapping.pluginParameters.begin());
+    }
+
+    while (currentMappingIt != currentMapping.pluginParameters.end()) {
+        for (int i = 0; i < currentMappingIt->parameters.size(); ++i) {
+            currentMappingIt->parameters[i].value = 0;
+            for (int j = 0; j < mappingPointIterators.size(); ++j) {
+                currentMappingIt->parameters[i].value += mappingPointIterators[j]->parameters[i].value * weights[j];
+            }
+        }
+        ++currentMappingIt;
+        for (auto& it: mappingPointIterators) {
+            ++it;
         }
     }
 }
@@ -182,9 +234,9 @@ void MappingCenter::importFromXml(const juce::XmlElement &xml) {
         criticalSection.exit();
         return;
     }
-    currentMapping.position.x = currentPosition->getDoubleAttribute("x", 0);
-    currentMapping.position.x = currentPosition->getDoubleAttribute("x", 0);
-    currentMapping.position.x = currentPosition->getDoubleAttribute("x", 0);
+    currentMapping.position.x = static_cast<float>(currentPosition->getDoubleAttribute("x", 0));
+    currentMapping.position.x = static_cast<float>(currentPosition->getDoubleAttribute("x", 0));
+    currentMapping.position.x = static_cast<float>(currentPosition->getDoubleAttribute("x", 0));
     pluginGroup.resetAllPlugins();
     auto currentPlugins = currentState->getChildByName("plugins");
     if (currentPlugins != nullptr) {
@@ -227,9 +279,9 @@ void MappingCenter::importFromXml(const juce::XmlElement &xml) {
         if (mapPosition == nullptr) {
             continue;
         }
-        newMapping.position.x = mapPosition->getDoubleAttribute("x", 0);
-        newMapping.position.x = mapPosition->getDoubleAttribute("x", 0);
-        newMapping.position.x = mapPosition->getDoubleAttribute("x", 0);
+        newMapping.position.x = static_cast<float>(mapPosition->getDoubleAttribute("x", 0));
+        newMapping.position.x = static_cast<float>(mapPosition->getDoubleAttribute("x", 0));
+        newMapping.position.x = static_cast<float>(mapPosition->getDoubleAttribute("x", 0));
         auto plugs = mapPoint->getChildByName("plugins");
         if (plugs != nullptr) {
             newMapping.pluginParameters.clear();
@@ -265,7 +317,7 @@ void MappingCenter::importFromXml(const juce::XmlElement &xml) {
 
 juce::AudioProcessor* MappingCenter::getNthProcessor(int n) {
     int i = 0;
-    for (auto plugin : currentMapping.pluginParameters) {
+    for (auto& plugin : currentMapping.pluginParameters) {
         if (i == n) {
             return &plugin.processor;
         }

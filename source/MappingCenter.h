@@ -57,6 +57,7 @@ public:
     void importFromXml(const juce::XmlElement& xml);
 
 private:
+    static float closeness(juce::Vector3D<float> a, juce::Vector3D<float>b);
     void insertInto(MappingPoint& mapping, const juce::File& file);
     void removeFrom(MappingPoint& mapping);
 
