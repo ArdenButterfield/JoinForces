@@ -39,7 +39,7 @@ PluginEditor::PluginEditor (PluginProcessor& p)
             juce::File file (chooser.getResult());
 
             juce::String errorMessage;
-            processorRef.getPluginGroup()->addPlugin(file, errorMessage);
+            processorRef.getMappingCenter()->addPlugin(file, errorMessage);
             if (errorMessage != "") {
                 std::cout << "error in adding plugin:" << errorMessage << "\n";
             }

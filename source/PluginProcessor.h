@@ -41,10 +41,6 @@ public:
     void getStateInformation (juce::MemoryBlock& destData) override;
     void setStateInformation (const void* data, int sizeInBytes) override;
 
-    PluginGroup* getPluginGroup() {
-        return &pluginGroup;
-    }
-
     MappingCenter* getMappingCenter() {
         return &mappingCenter;
     }
@@ -54,7 +50,6 @@ public:
     }
 
 private:
-    PluginGroup pluginGroup;
     ForceFeedbackInterface forceFeedbackInterface;
     MappingCenter mappingCenter;
 

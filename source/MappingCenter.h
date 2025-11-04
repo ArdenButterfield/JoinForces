@@ -22,6 +22,7 @@ struct Parameter {
 
 struct PluginParameterSet {
     juce::AudioProcessor& processor;
+    juce::File file;
     std::vector<Parameter> parameters;
 };
 
@@ -30,9 +31,9 @@ struct MappingPoint {
     std::list<PluginParameterSet> pluginParameters;
 };
 
-class MappingCenter : public PluginGroup::Listener {
+class MappingCenter {
 public:
-    MappingCenter(PluginGroup& group, ForceFeedbackInterface& ffInterface);
+    MappingCenter(juce::AudioProcessor::BusesLayout layout, ForceFeedbackInterface& ffInterface);
     ~MappingCenter();
     void createMappingAtCurrentState();
     std::list<MappingPoint>& getMappings() {
@@ -43,15 +44,16 @@ public:
         return currentMapping;
     }
 
-    PluginGroup& group;
     ForceFeedbackInterface& ffInterface;
 
-    void processBlock();
+    void processBlock(juce::AudioBuffer<float>& buffer,
+                                              juce::MidiBuffer& midiMessages);
 
+    int addPlugin(const juce::File& file, juce::String& errorMessage);
+
+    PluginGroup pluginGroup;
 private:
-    void groupUpdated(const PluginGroup &group) override;
-
-    void insertInto(MappingPoint& mapping);
+    void insertInto(MappingPoint& mapping, const juce::File& file);
     void removeFrom(MappingPoint& mapping);
 
     std::list<MappingPoint> mappings;
@@ -59,6 +61,8 @@ private:
     void calculateCurrentMapping();
 
     juce::CriticalSection criticalSection;
+    void exportToXml(juce::XmlElement& xml);
+    void importFromXml(const juce::XmlElement& xml);
 };
 
 

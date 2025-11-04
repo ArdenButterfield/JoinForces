@@ -10,7 +10,7 @@ PluginProcessor::PluginProcessor()
                       #endif
                        .withOutput ("Output", juce::AudioChannelSet::stereo(), true)
                      #endif
-                       ), pluginGroup(getBusesLayout()), forceFeedbackInterface(), mappingCenter(pluginGroup, forceFeedbackInterface)
+                       ), forceFeedbackInterface(), mappingCenter(getBusesLayout(), forceFeedbackInterface)
 {
 }
 
@@ -87,7 +87,7 @@ void PluginProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
 {
     // Use this method as the place to do any pre-playback
     // initialisation that you need..
-    pluginGroup.prepareToPlay(getMainBusNumInputChannels(), getMainBusNumOutputChannels(), sampleRate, samplesPerBlock);
+    mappingCenter.pluginGroup.prepareToPlay(getMainBusNumInputChannels(), getMainBusNumOutputChannels(), sampleRate, samplesPerBlock);
     forceFeedbackInterface.init();
 }
 
@@ -95,7 +95,7 @@ void PluginProcessor::releaseResources()
 {
     // When playback stops, you can use this as an opportunity to free up any
     // spare memory, etc.
-    pluginGroup.releaseResources();
+    mappingCenter.pluginGroup.releaseResources();
 }
 
 bool PluginProcessor::isBusesLayoutSupported (const BusesLayout& layouts) const
@@ -138,9 +138,8 @@ void PluginProcessor::processBlock (juce::AudioBuffer<float>& buffer,
     for (auto i = totalNumInputChannels; i < totalNumOutputChannels; ++i)
         buffer.clear (i, 0, buffer.getNumSamples());
 
-    mappingCenter.processBlock();
+    mappingCenter.processBlock(buffer, midiMessages);
 
-    pluginGroup.processBlock(buffer, midiMessages);
 }
 
 //==============================================================================
