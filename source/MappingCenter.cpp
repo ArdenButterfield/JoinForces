@@ -46,10 +46,19 @@ void MappingCenter::processBlock(juce::AudioBuffer<float>& buffer,
     if (ffInterface.isInitialized()) {
         currentMapping.position = ffInterface.getCurrentPosition();
     }
-    xParam->setValueNotifyingHost(currentMapping.position.x);
-    yParam->setValueNotifyingHost(currentMapping.position.y);
-    zParam->setValueNotifyingHost(currentMapping.position.z);
+    if (inputEnabled) {
+        xParam->beginChangeGesture();
+        yParam->beginChangeGesture();
+        zParam->beginChangeGesture();
 
+        xParam->setValueNotifyingHost(currentMapping.position.x);
+        yParam->setValueNotifyingHost(currentMapping.position.y);
+        zParam->setValueNotifyingHost(currentMapping.position.z);
+
+        xParam->endChangeGesture();
+        yParam->endChangeGesture();
+        zParam->endChangeGesture();
+    }
 
     calculateCurrentMapping();
 
@@ -330,9 +339,11 @@ void MappingCenter::importFromXml(const juce::XmlElement &xml) {
 }
 
 void MappingCenter::parameterValueChanged(int parameterIndex, float newValue) {
-    currentMapping.position.x = *xParam;
-    currentMapping.position.y = *yParam;
-    currentMapping.position.z = *zParam;
+    if (!inputEnabled) {
+        currentMapping.position.x = *xParam;
+        currentMapping.position.y = *yParam;
+        currentMapping.position.z = *zParam;
+    }
 }
 
 void MappingCenter::parameterGestureChanged(int parameterIndex, bool gestureIsStarting) {

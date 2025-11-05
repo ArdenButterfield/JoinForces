@@ -59,6 +59,8 @@ public:
     juce::AudioParameterFloat* xParam;
     juce::AudioParameterFloat* yParam;
     juce::AudioParameterFloat* zParam;
+
+    bool inputEnabled;
 private:
     void parameterValueChanged(int parameterIndex, float newValue) override;
     void parameterGestureChanged(int parameterIndex, bool gestureIsStarting) override;

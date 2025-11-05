@@ -14,13 +14,16 @@ class MappingCenter;
 class SliderColumn;
 class ParameterNamesColumn;
 
-class MappingsPanel : public juce::Component, public juce::Timer {
+class MappingsPanel : public juce::Component, public juce::Timer, public juce::Button::Listener {
 public:
     explicit MappingsPanel(MappingCenter&);
     ~MappingsPanel() override;
     void paint(juce::Graphics &g) override;
     void resized() override;
 private:
+    void buttonClicked(juce::Button *) override;
+    void buttonStateChanged(juce::Button *) override;
+    juce::ToggleButton inputEnabledButton;
     void timerCallback() override;
     std::unique_ptr<SliderColumn> currentColumn;
     std::vector<std::unique_ptr<SliderColumn>> mappingPointColumns;
