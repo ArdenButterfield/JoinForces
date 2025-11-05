@@ -8,10 +8,10 @@ CurrentParameterValueSlider::CurrentParameterValueSlider(Parameter& p) : paramet
     setSliderStyle(juce::Slider::LinearHorizontal);
     setTextBoxStyle(juce::Slider::TextBoxRight, true, 100, 40);
     setRange(0, 1, 1.0 / (parameter.parameter.getNumSteps() - 1.0));
+    startTimerHz(60);
 }
 
-CurrentParameterValueSlider::~CurrentParameterValueSlider() {
-}
+CurrentParameterValueSlider::~CurrentParameterValueSlider() = default;
 
 double CurrentParameterValueSlider::getValueFromText(const juce::String &text) {
     return parameter.parameter.getValueForText(text);
@@ -22,7 +22,7 @@ juce::String CurrentParameterValueSlider::getTextFromValue(double value) {
 }
 
 void CurrentParameterValueSlider::timerCallback() {
-    setValue(parameter.value);
+    setValue(parameter.value, juce::dontSendNotification);
     updateText();
 }
 

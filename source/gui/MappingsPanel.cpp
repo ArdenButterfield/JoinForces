@@ -38,8 +38,8 @@ void MappingsPanel::resized() {
     x += JoinForcesLookFeel::getNamesColumnWidth();
     currentColumn->setTopLeftPosition(x,0);
     x += JoinForcesLookFeel::getColumnWidth();
-    for (int i = 0; i < mappingPointColumns.size(); i++) {
-        mappingPointColumns[i]->setTopLeftPosition(x, 0);
+    for (const auto & mappingPointColumn : mappingPointColumns) {
+        mappingPointColumn->setTopLeftPosition(x, 0);
         x += JoinForcesLookFeel::getColumnWidth();
     }
 }
