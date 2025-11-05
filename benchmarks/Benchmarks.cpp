@@ -1,3 +1,6 @@
+#include "PluginProcessor.h"
+#include "PluginEditor.h"
+
 TEST_CASE ("Boot performance")
 {
     BENCHMARK_ADVANCED ("Processor constructor")

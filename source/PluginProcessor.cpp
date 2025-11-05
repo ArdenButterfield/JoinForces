@@ -12,6 +12,9 @@ PluginProcessor::PluginProcessor()
                      #endif
                        ), forceFeedbackInterface(), mappingCenter(getBusesLayout(), forceFeedbackInterface)
 {
+    addParameter (mappingCenter.xParam);
+    addParameter (mappingCenter.yParam);
+    addParameter (mappingCenter.zParam);
 }
 
 PluginProcessor::~PluginProcessor()

@@ -31,7 +31,7 @@ struct MappingPoint {
     std::list<PluginParameterSet> pluginParameters;
 };
 
-class MappingCenter {
+class MappingCenter : public juce::AudioProcessorParameter::Listener {
 public:
     MappingCenter(const juce::AudioProcessor::BusesLayout &layout, ForceFeedbackInterface& ffInterface);
     ~MappingCenter();
@@ -56,7 +56,12 @@ public:
     void exportToXml(juce::XmlElement& xml);
     void importFromXml(const juce::XmlElement& xml);
 
+    juce::AudioParameterFloat* xParam;
+    juce::AudioParameterFloat* yParam;
+    juce::AudioParameterFloat* zParam;
 private:
+    void parameterValueChanged(int parameterIndex, float newValue) override;
+    void parameterGestureChanged(int parameterIndex, bool gestureIsStarting) override;
     static float closeness(juce::Vector3D<float> a, juce::Vector3D<float>b);
     void insertInto(MappingPoint& mapping, const juce::File& file);
     void removeFrom(MappingPoint& mapping);

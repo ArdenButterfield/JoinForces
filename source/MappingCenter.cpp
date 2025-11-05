@@ -10,10 +10,20 @@
 #include "PluginGroup.h"
 #include "juce_dsp/maths/juce_FastMathApproximations.h"
 
-MappingCenter::MappingCenter(const juce::AudioProcessor::BusesLayout &layout, ForceFeedbackInterface &_interface) : busesLayout(layout), pluginGroup(layout), ffInterface(_interface) {
+MappingCenter::MappingCenter(const juce::AudioProcessor::BusesLayout &layout, ForceFeedbackInterface &_interface) :
+        xParam(new juce::AudioParameterFloat(juce::ParameterID{"x", 1}, "x", 0, 1, 0)),
+        yParam(new juce::AudioParameterFloat( juce::ParameterID{"y", 1}, "y", 0, 1, 0)),
+        zParam(new juce::AudioParameterFloat(juce::ParameterID{"z", 1}, "z", 0, 1, 0)),
+        busesLayout(layout), pluginGroup(layout), ffInterface(_interface) {
+    xParam->addListener(this);
+    yParam->addListener(this);
+    zParam->addListener(this);
 }
 
 MappingCenter::~MappingCenter() {
+    xParam->removeListener(this);
+    yParam->removeListener(this);
+    zParam->removeListener(this);
 }
 
 void MappingCenter::createMappingAtCurrentState() {
@@ -36,6 +46,10 @@ void MappingCenter::processBlock(juce::AudioBuffer<float>& buffer,
     if (ffInterface.isInitialized()) {
         currentMapping.position = ffInterface.getCurrentPosition();
     }
+    xParam->setValueNotifyingHost(currentMapping.position.x);
+    yParam->setValueNotifyingHost(currentMapping.position.y);
+    zParam->setValueNotifyingHost(currentMapping.position.z);
+
 
     calculateCurrentMapping();
 
@@ -313,6 +327,15 @@ void MappingCenter::importFromXml(const juce::XmlElement &xml) {
         mappings.push_back(newMapping);
     }
     criticalSection.exit();
+}
+
+void MappingCenter::parameterValueChanged(int parameterIndex, float newValue) {
+    currentMapping.position.x = *xParam;
+    currentMapping.position.y = *yParam;
+    currentMapping.position.z = *zParam;
+}
+
+void MappingCenter::parameterGestureChanged(int parameterIndex, bool gestureIsStarting) {
 }
 
 juce::AudioProcessor* MappingCenter::getNthProcessor(int n) {
