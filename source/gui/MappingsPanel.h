@@ -13,6 +13,7 @@
 class MappingCenter;
 class SliderColumn;
 class ParameterNamesColumn;
+class PositionsVisualizer;
 
 class MappingsPanel : public juce::Component, public juce::Timer, public juce::Button::Listener {
 public:
@@ -23,12 +24,12 @@ public:
 private:
     void buttonClicked(juce::Button *) override;
     void buttonStateChanged(juce::Button *) override;
-    juce::ToggleButton inputEnabledButton;
     void timerCallback() override;
     std::unique_ptr<SliderColumn> currentColumn;
     std::vector<std::unique_ptr<SliderColumn>> mappingPointColumns;
     std::unique_ptr<ParameterNamesColumn> parameterNamesColumn;
     MappingCenter& mappingCenter;
+    std::unique_ptr<PositionsVisualizer> positionsVisualizer;
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(MappingsPanel)
 };
 

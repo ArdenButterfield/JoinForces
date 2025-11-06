@@ -31,8 +31,12 @@ PluginEditor::PluginEditor (PluginProcessor& p)
 
     // this chunk of code instantiates and opens the melatonin inspector
     addPluginButton.onClick = [&] {
-        fileChooser = std::make_unique<juce::FileChooser> ("Select an audio plugin...",
-                                       juce::File::getSpecialLocation (juce::File::globalApplicationsDirectory),
+        fileChooser = std::make_unique<juce::FileChooser> ("Select an audio plugin",
+#if JUCE_WINDOWS
+                                       juce::File::getSpecialLocation (juce::File::globalApplicationsDirectory).getChildFile("Common Files").getChildFile("VST3"),
+#else
+                                       juce::File::getSpecialLocation(juce::File::globalApplicationsDirectory)
+#endif
                                        "*");
 
         auto folderChooserFlags = juce::FileBrowserComponent::openMode | juce::FileBrowserComponent::canSelectDirectories | juce::FileBrowserComponent::canSelectFiles;
@@ -65,9 +69,18 @@ PluginEditor::PluginEditor (PluginProcessor& p)
         juce::SystemClipboard::copyTextToClipboard(element.toString());
     };
 
+    inputEnabledButton.addListener(this);
+    addAndMakeVisible(inputEnabledButton);
+    inputEnabledButton.setButtonText("Gestural Input Enabled");
+    inputEnabledButton.setColour(juce::ToggleButton::ColourIds::textColourId, juce::Colours::black);
+    inputEnabledButton.setColour(juce::ToggleButton::ColourIds::tickColourId, juce::Colours::black);
+
+
     // Make sure that before the constructor has finished, you've set the
     // editor's size to whatever you need it to be.
     setSize (400, 300);
+
+    startTimerHz(30);
 
     setResizable (true, true);
 }
@@ -91,10 +104,26 @@ void PluginEditor::resized()
     inspectButton.setBounds({0,0,150, 40});
     importFromClipboardButton.setBounds(inspectButton.getBounds().withX(inspectButton.getRight() + 10));
     exportToClipboardButton.setBounds(importFromClipboardButton.getBounds().withX(importFromClipboardButton.getRight() + 10));
+    inputEnabledButton.setBounds(exportToClipboardButton.getBounds().withX(exportToClipboardButton.getRight() + 10));
+
     auto usableArea = getLocalBounds().withSizeKeepingCentre(getWidth() - 20, getHeight() - 20).withTop(inspectButton.getBottom() + 10);
 
     createMappingButton.setBounds(usableArea.withHeight(30).withWidth(150));
     addPluginButton.setBounds(createMappingButton.getBounds().withY(createMappingButton.getBottom() + 10));
 
     mappingViewport.setBounds(usableArea.withTrimmedTop(addPluginButton.getBottom() + 10));
+
+
+}
+
+void PluginEditor::buttonClicked(juce::Button *) {
+}
+
+void PluginEditor::buttonStateChanged(juce::Button *button) {
+    processorRef.getMappingCenter()->inputEnabled = inputEnabledButton.getToggleState();
+
+}
+
+void PluginEditor::timerCallback() {
+    inputEnabledButton.setToggleState(processorRef.getMappingCenter()->inputEnabled, juce::dontSendNotification);
 }

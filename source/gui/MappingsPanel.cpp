@@ -6,6 +6,7 @@
 #include "MappingsPanel.h"
 #include "SliderColumn.h"
 #include "ParameterNamesColumn.h"
+#include "PositionsVisualizer.h"
 
 #include "JoinForcesLookFeel.h"
 
@@ -17,14 +18,12 @@ MappingsPanel::MappingsPanel(MappingCenter& mc) : mappingCenter(mc) {
     parameterNamesColumn = std::make_unique<ParameterNamesColumn>(mappingCenter);
     addAndMakeVisible(parameterNamesColumn.get());
 
+    positionsVisualizer = std::make_unique<PositionsVisualizer>(mappingCenter);
+    addAndMakeVisible(positionsVisualizer.get());
+
     setSize(JoinForcesLookFeel::getMappingPanelRequiredWidth(mappingCenter),
             JoinForcesLookFeel::getColumnRequiredHeight(mappingCenter));
     startTimerHz(30);
-    inputEnabledButton.addListener(this);
-    addAndMakeVisible(inputEnabledButton);
-    inputEnabledButton.setButtonText("Gestural Input Enabled");
-    inputEnabledButton.setColour(juce::ToggleButton::ColourIds::textColourId, juce::Colours::black);
-    inputEnabledButton.setColour(juce::ToggleButton::ColourIds::tickColourId, juce::Colours::black);
 }
 
 MappingsPanel::~MappingsPanel() {
@@ -47,18 +46,16 @@ void MappingsPanel::resized() {
         mappingPointColumn->setTopLeftPosition(x, 0);
         x += JoinForcesLookFeel::getColumnWidth();
     }
-    inputEnabledButton.setBounds(parameterNamesColumn->getBounds().withHeight(30));
+    positionsVisualizer->setBounds(parameterNamesColumn->getBounds().withHeight(JoinForcesLookFeel::getPositionVizHeight()));
 }
 
 void MappingsPanel::buttonClicked(juce::Button *) {
 }
 
-void MappingsPanel::buttonStateChanged(juce::Button *button) {
-    mappingCenter.inputEnabled = inputEnabledButton.getToggleState();
+void MappingsPanel::buttonStateChanged(juce::Button*) {
 }
 
 void MappingsPanel::timerCallback() {
-    inputEnabledButton.setToggleState(mappingCenter.inputEnabled, juce::dontSendNotification);
     if (mappingCenter.getMappings().size() != mappingPointColumns.size()) {
         mappingPointColumns.clear();
 
