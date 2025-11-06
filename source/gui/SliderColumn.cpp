@@ -6,8 +6,8 @@
 #include "JoinForcesLookFeel.h"
 
 SliderColumn::SliderColumn(MappingCenter& mc, MappingPoint& mp, int ci)
-: editable(false), mappingCenter(mc), mappingPoint(mp), positionVisualizer(mappingPoint.position), columnIndex(ci) {
-    addAndMakeVisible(positionVisualizer);
+: editable(false), mappingCenter(mc), mappingPoint(mp), positionSliders(mappingPoint.position), columnIndex(ci) {
+    addAndMakeVisible(positionSliders);
     rebuildParameterPanels();
     startTimerHz(60);
 }
@@ -17,8 +17,8 @@ SliderColumn::~SliderColumn() {
 
 void SliderColumn::resized() {
     int y = 0;
-    positionVisualizer.setTopLeftPosition(0,0);
-    y += positionVisualizer.getHeight();
+    positionSliders.setTopLeftPosition(0,0);
+    y += positionSliders.getHeight();
     for (auto& panel : parameterPanels) {
         panel->setTopLeftPosition(0, y);
         y += panel->getHeight();

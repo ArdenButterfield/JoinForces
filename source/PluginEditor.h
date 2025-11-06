@@ -2,7 +2,7 @@
 
 #include "PluginProcessor.h"
 #include "gui/MappingsPanel.h"
-#include "gui/PositionVisualizer.h"
+#include "gui/PositionSliders.h"
 #include "juce_gui_basics/juce_gui_basics.h"
 
 #include "melatonin_inspector/melatonin_inspector.h"

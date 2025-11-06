@@ -8,7 +8,7 @@
 #include "../MappingCenter.h"
 #include "juce_gui_basics/juce_gui_basics.h"
 
-#include "PositionVisualizer.h"
+#include "PositionSliders.h"
 #include <vector>
 #include <memory>
 
@@ -28,7 +28,7 @@ private:
     bool editable;
     MappingCenter& mappingCenter;
     MappingPoint& mappingPoint;
-    PositionVisualizer positionVisualizer;
+    PositionSliders positionSliders;
     std::vector<std::unique_ptr<PluginParametersPanel>> parameterPanels;
 };
 

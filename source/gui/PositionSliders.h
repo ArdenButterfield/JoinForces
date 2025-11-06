@@ -9,10 +9,10 @@
 #include "juce_opengl/juce_opengl.h"
 #include <array>
 
-class PositionVisualizer : public juce::Component, public juce::Timer, public juce::Slider::Listener {
+class PositionSliders : public juce::Component, public juce::Timer, public juce::Slider::Listener {
 public:
-    PositionVisualizer(juce::Vector3D<float>&);
-    ~PositionVisualizer();
+    PositionSliders(juce::Vector3D<float>&);
+    ~PositionSliders();
     void paint(juce::Graphics &g) override;
     void resized() override;
     void timerCallback() override;
