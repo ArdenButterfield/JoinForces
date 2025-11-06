@@ -63,6 +63,9 @@ HDCallbackCode ForceFeedbackInterface::callback() {
     position.y = convertToMinMax(positionPoints[1]);
     position.z = convertToMinMax(positionPoints[2]);
 
+    HDdouble force[3] = {0.5, 0.0, 1.0};
+    hdSetDoublev(HD_CURRENT_FORCE,force);
+
     /* End haptics frame. */
     hdEndFrame(hHD);
 

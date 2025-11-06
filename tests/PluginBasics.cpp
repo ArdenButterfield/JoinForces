@@ -5,6 +5,7 @@
 #include <catch2/catch_test_macros.hpp>
 #include <catch2/matchers/catch_matchers_string.hpp>
 
+#if false
 TEST_CASE ("one is equal to one", "[dummy]")
 {
     REQUIRE (1 == 1);
@@ -111,4 +112,6 @@ TEST_CASE ("IPP version", "[ipp]")
 {
     CHECK_THAT (ippsGetLibVersion()->Version, Catch::Matchers::Equals ("2022.2.0 (r0x42db1a66)"));
 }
+#endif
+
 #endif

@@ -14,7 +14,7 @@ MappingCenter::MappingCenter(const juce::AudioProcessor::BusesLayout &layout, Fo
         xParam(new juce::AudioParameterFloat(juce::ParameterID{"x", 1}, "x", 0, 1, 0)),
         yParam(new juce::AudioParameterFloat( juce::ParameterID{"y", 1}, "y", 0, 1, 0)),
         zParam(new juce::AudioParameterFloat(juce::ParameterID{"z", 1}, "z", 0, 1, 0)),
-        busesLayout(layout), pluginGroup(layout), ffInterface(_interface) {
+        busesLayout(layout), pluginGroup(layout), ffInterface(_interface), inputEnabled(true) {
     xParam->addListener(this);
     yParam->addListener(this);
     zParam->addListener(this);
