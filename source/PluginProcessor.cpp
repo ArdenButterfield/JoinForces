@@ -10,7 +10,7 @@ PluginProcessor::PluginProcessor()
                       #endif
                        .withOutput ("Output", juce::AudioChannelSet::stereo(), true)
                      #endif
-                       ), forceFeedbackInterface(), mappingCenter(getBusesLayout(), forceFeedbackInterface)
+                       ), mappingCenter(getBusesLayout(), forceFeedbackInterface)
 {
     addParameter (mappingCenter.xParam);
     addParameter (mappingCenter.yParam);

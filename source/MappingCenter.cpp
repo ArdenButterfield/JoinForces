@@ -18,6 +18,8 @@ MappingCenter::MappingCenter(const juce::AudioProcessor::BusesLayout &layout, Fo
     xParam->addListener(this);
     yParam->addListener(this);
     zParam->addListener(this);
+
+    ffInterface.setMappingCenter(this);
 }
 
 MappingCenter::~MappingCenter() {

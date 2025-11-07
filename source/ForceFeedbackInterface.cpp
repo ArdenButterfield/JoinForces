@@ -4,7 +4,11 @@
 
 #include "ForceFeedbackInterface.h"
 
-ForceFeedbackInterface::ForceFeedbackInterface() : initialized(false) {
+#include "MappingCenter.h"
+
+ForceFeedbackInterface::ForceFeedbackInterface()
+: mappingCenter(nullptr), initialized(false), schedulerHandle(0) {
+
 }
 
 ForceFeedbackInterface::~ForceFeedbackInterface() {
@@ -63,7 +67,13 @@ HDCallbackCode ForceFeedbackInterface::callback() {
     position.y = convertToMinMax(positionPoints[1]);
     position.z = convertToMinMax(positionPoints[2]);
 
-    HDdouble force[3] = {0.5, 0.0, 1.0};
+    HDdouble force[3] = {0,0,0};
+
+    auto attractionForce = getMappingPointAttractionForce();
+    force[0] += attractionForce.x;
+    force[1] += attractionForce.y;
+    force[2] += attractionForce.z;
+
     hdSetDoublev(HD_CURRENT_FORCE,force);
 
     /* End haptics frame. */
@@ -74,6 +84,32 @@ HDCallbackCode ForceFeedbackInterface::callback() {
 
 bool ForceFeedbackInterface::isInitialized() {
     return initialized;
+}
+
+void ForceFeedbackInterface::setMappingCenter(MappingCenter* mc) {
+    mappingCenter = mc;
+}
+
+juce::Vector3D<float> ForceFeedbackInterface::getMappingPointAttractionForce() const {
+    auto force = juce::Vector3D<float>(0,0,0);
+    if (mappingCenter == nullptr) {
+        return force;
+    }
+
+    auto currentPos = mappingCenter->getCurrentMapping().position;
+
+
+    for (auto mapping : mappingCenter->getMappings()) {
+        auto vectorToPos = mapping.position - currentPos;
+        auto lSquared = vectorToPos.lengthSquared();
+
+        if (lSquared < eyeRadiusSquared) {
+            return {0,0,0};
+        }
+
+            force += vectorToPos * eyeRadius / lSquared;
+    }
+    return force;
 }
 
 HDCallbackCode ffCallback(void *data) {
