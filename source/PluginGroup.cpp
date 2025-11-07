@@ -104,6 +104,11 @@ juce::AudioProcessor* PluginGroup::addPlugin(const juce::File& file, juce::Strin
         *description, sampleRate, samplesPerBlock, errorMessage);
     pluginInstance->setBusesLayout(busesLayout);
     pluginInstance->prepareToPlay(sampleRate, samplesPerBlock);
+
+    for (auto& parameter : pluginInstance->getParameters()) {
+        parameter->setValueNotifyingHost(parameter->getDefaultValue());
+    }
+
     auto newNode = graph.addNode(std::move(pluginInstance));
 
     nodeIDs.push_back(newNode->nodeID);

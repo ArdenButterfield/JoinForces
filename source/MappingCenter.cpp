@@ -29,7 +29,7 @@ MappingCenter::~MappingCenter() {
 }
 
 void MappingCenter::createMappingAtCurrentState() {
-    criticalSection.enter();
+        criticalSection.enter();
     auto newMapping = MappingPoint();
     newMapping.position = ffInterface.getCurrentPosition();
     for (auto plugin : currentMapping.pluginParameters) {
@@ -187,23 +187,27 @@ void MappingCenter::calculateCurrentMapping() {
         }
     }
 
-    auto currentMappingIt = currentMapping.pluginParameters.begin();
-    std::vector<std::list<PluginParameterSet>::iterator> mappingPointIterators;
-    for (auto& mapping : mappings) {
-        mappingPointIterators.push_back(mapping.pluginParameters.begin());
-    }
 
-    while (currentMappingIt != currentMapping.pluginParameters.end()) {
-        for (int i = 0; i < currentMappingIt->parameters.size(); ++i) {
-            currentMappingIt->parameters[i].value = 0;
-            for (int j = 0; j < mappingPointIterators.size(); ++j) {
-                currentMappingIt->parameters[i].value += mappingPointIterators[j]->parameters[i].value * weights[j];
+    if (!mappings.empty()) {
+        auto currentMappingIt = currentMapping.pluginParameters.begin();
+        std::vector<std::list<PluginParameterSet>::iterator> mappingPointIterators;
+        for (auto& mapping : mappings) {
+            mappingPointIterators.push_back(mapping.pluginParameters.begin());
+        }
+
+        while (currentMappingIt != currentMapping.pluginParameters.end()) {
+            for (int i = 0; i < currentMappingIt->parameters.size(); ++i) {
+                currentMappingIt->parameters[i].value = 0;
+                for (int j = 0; j < mappingPointIterators.size(); ++j) {
+                    currentMappingIt->parameters[i].value += mappingPointIterators[j]->parameters[i].value * weights[j];
+                }
+            }
+            ++currentMappingIt;
+            for (auto& it: mappingPointIterators) {
+                ++it;
             }
         }
-        ++currentMappingIt;
-        for (auto& it: mappingPointIterators) {
-            ++it;
-        }
+
     }
 }
 
