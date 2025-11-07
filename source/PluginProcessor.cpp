@@ -99,6 +99,7 @@ void PluginProcessor::releaseResources()
     // When playback stops, you can use this as an opportunity to free up any
     // spare memory, etc.
     mappingCenter.pluginGroup.releaseResources();
+    forceFeedbackInterface.deInit();
 }
 
 bool PluginProcessor::isBusesLayoutSupported (const BusesLayout& layouts) const

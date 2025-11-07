@@ -36,7 +36,7 @@ void PositionsVisualizer::paint(juce::Graphics &g) {
 
 void PositionsVisualizer::drawSymbol(juce::Graphics &g, juce::Vector3D<float> &position, bool isCurrentPosition) {
     auto x = position.x;
-    auto y = position.y;
+    auto y = 1 - position.y; // in juce, positive y direction is down
     auto hue = position.z;
 
     x *= usableBounds.getWidth();

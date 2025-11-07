@@ -8,7 +8,7 @@
 
 ForceFeedbackInterface::ForceFeedbackInterface()
 : mappingCenter(nullptr), initialized(false), schedulerHandle(0) {
-
+    samplesWithoutSync = 0;
 }
 
 ForceFeedbackInterface::~ForceFeedbackInterface() {
@@ -39,6 +39,12 @@ juce::Vector3D<float> ForceFeedbackInterface::getCurrentPosition() {
 }
 
 void ForceFeedbackInterface::deInit() {
+    if (initialized) {
+        hdStopScheduler();
+        hdUnschedule(schedulerHandle);
+        hdDisableDevice(HD_DEFAULT_DEVICE);
+        initialized = false;
+    }
 }
 
 HDCallbackCode ForceFeedbackInterface::callback() {
@@ -63,9 +69,21 @@ HDCallbackCode ForceFeedbackInterface::callback() {
         return v;
     };
 
-    position.x = convertToMinMax(positionPoints[0]);
-    position.y = convertToMinMax(positionPoints[1]);
-    position.z = convertToMinMax(positionPoints[2]);
+    auto x  = convertToMinMax(positionPoints[0]);
+    auto y  = convertToMinMax(positionPoints[1]);
+    auto z  = convertToMinMax(positionPoints[2]);
+
+    if  (samplesWithoutSync > 10 ||
+        ((std::abs(x - position.x) < positionEpsilon)
+        && std::abs(y - position.y) < positionEpsilon
+        && std::abs(z - position.z) < positionEpsilon)) {
+        position.x = x;
+        position.y = y;
+        position.z = z;
+        samplesWithoutSync = 0;
+    } else {
+        samplesWithoutSync++;
+    }
 
     HDdouble force[3] = {0,0,0};
 

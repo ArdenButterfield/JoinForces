@@ -37,6 +37,9 @@ private:
 
     const float eyeRadius = 0.01f;
     const float eyeRadiusSquared = eyeRadius * eyeRadius;
+    const float positionEpsilon = 0.05f;
+
+    int samplesWithoutSync;
 
 };
 
