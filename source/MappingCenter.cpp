@@ -234,9 +234,10 @@ void MappingCenter::exportToXml(juce::XmlElement &xml) {
         mpPosition->setAttribute("x", mapPoint.position.x);
         mpPosition->setAttribute("y", mapPoint.position.y);
         mpPosition->setAttribute("z", mapPoint.position.z);
-        auto mpPplugins = mpPosition->createNewChildElement("plugins");
+        auto mpPplugins = mp->createNewChildElement("plugins");
         for (auto& plugin : mapPoint.pluginParameters) {
             auto p = mpPplugins->createNewChildElement("plugin");
+            p->setAttribute("path", plugin.file.getFullPathName());
             auto par = p->createNewChildElement("params");
             for (auto& param : plugin.parameters) {
                 par->setAttribute("param_" + juce::String(param.parameter.getParameterIndex()), param.value);

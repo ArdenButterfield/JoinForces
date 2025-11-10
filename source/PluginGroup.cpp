@@ -52,7 +52,6 @@ void PluginGroup::updateGraph() {
 
 
 void PluginGroup::prepareToPlay(int input, int output, double _sampleRate, int _samplesPerBlockExpected) {
-    std::cout << "prepare to play group" << this << "\n";
     sampleRate = _sampleRate;
     samplesPerBlock = _samplesPerBlockExpected;
     numInputChannels = input;
