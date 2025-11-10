@@ -6,14 +6,13 @@
 #include "JoinForcesLookFeel.h"
 
 SliderColumn::SliderColumn(MappingCenter& mc, MappingPoint& mp, int ci)
-: editable(false), mappingCenter(mc), mappingPoint(mp), positionSliders(mappingPoint.position), columnIndex(ci) {
+: editable(false), mappingCenter(mc), mappingPoint(mp), positionSliders(mappingPoint.position), columnIndex(ci), isCurrentParamColumn(columnIndex == 0) {
     addAndMakeVisible(positionSliders);
     rebuildParameterPanels();
     startTimerHz(60);
 }
 
-SliderColumn::~SliderColumn() {
-}
+SliderColumn::~SliderColumn() = default;
 
 void SliderColumn::resized() {
     int y = 0;
@@ -26,7 +25,11 @@ void SliderColumn::resized() {
 }
 
 void SliderColumn::paint(juce::Graphics &g) {
-    g.fillAll(juce::Colours::darkgreen);
+    if (isCurrentParamColumn) {
+        g.fillAll(juce::Colours::darkblue);
+    } else {
+        g.fillAll(juce::Colours::darkgreen.withSaturation(mappingPoint.contributionWeight));
+    }
 }
 
 void SliderColumn::setEditable(bool) {
@@ -35,6 +38,7 @@ void SliderColumn::setEditable(bool) {
 
 void SliderColumn::timerCallback() {
     rebuildParameterPanels();
+    repaint();
 }
 
 void SliderColumn::rebuildParameterPanels() {

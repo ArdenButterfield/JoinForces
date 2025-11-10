@@ -191,10 +191,14 @@ void MappingCenter::calculateCurrentMapping() {
     if (!mappings.empty()) {
         auto currentMappingIt = currentMapping.pluginParameters.begin();
         std::vector<std::list<PluginParameterSet>::iterator> mappingPointIterators;
-        for (auto& mapping : mappings) {
-            mappingPointIterators.push_back(mapping.pluginParameters.begin());
+        {
+            int i = 0;
+            for (auto& mapping : mappings) {
+                mappingPointIterators.push_back(mapping.pluginParameters.begin());
+                mapping.contributionWeight = weights[i];
+                ++i;
+            }
         }
-
         while (currentMappingIt != currentMapping.pluginParameters.end()) {
             for (int i = 0; i < currentMappingIt->parameters.size(); ++i) {
                 currentMappingIt->parameters[i].value = 0;

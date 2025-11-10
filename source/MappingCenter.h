@@ -27,6 +27,7 @@ struct PluginParameterSet {
 };
 
 struct MappingPoint {
+    float contributionWeight = 0;
     juce::Vector3D<float> position;
     std::list<PluginParameterSet> pluginParameters;
 };

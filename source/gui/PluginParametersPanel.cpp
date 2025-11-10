@@ -36,9 +36,8 @@ void PluginParametersPanel::resized() {
 }
 
 void PluginParametersPanel::paint(juce::Graphics &g) {
-    g.fillAll(juce::Colours::darkblue);
     g.setColour(juce::Colours::lightblue);
-    g.drawRect(getLocalBounds(), 3);
+    g.drawRect(getLocalBounds(), 1);
 }
 
 void PluginParametersPanel::updateDisplay() {

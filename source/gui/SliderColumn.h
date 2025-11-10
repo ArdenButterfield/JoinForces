@@ -30,6 +30,7 @@ private:
     MappingPoint& mappingPoint;
     PositionSliders positionSliders;
     std::vector<std::unique_ptr<PluginParametersPanel>> parameterPanels;
+    bool isCurrentParamColumn;
 };
 
 
