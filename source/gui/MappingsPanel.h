@@ -30,6 +30,7 @@ private:
     std::unique_ptr<ParameterNamesColumn> parameterNamesColumn;
     MappingCenter& mappingCenter;
     std::unique_ptr<PositionsVisualizer> positionsVisualizer;
+    void setDoingAnythings();
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(MappingsPanel)
 };
 

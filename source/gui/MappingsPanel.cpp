@@ -72,4 +72,35 @@ void MappingsPanel::timerCallback() {
     setSize(JoinForcesLookFeel::getMappingPanelRequiredWidth(mappingCenter),
         JoinForcesLookFeel::getColumnRequiredHeight(mappingCenter));
 
+    setDoingAnythings();
+}
+
+void MappingsPanel::setDoingAnythings() {
+
+    for (int pluginI = 0; pluginI < currentColumn->parameterPanels.size(); ++pluginI) {
+        for (int paramI = 0; paramI < currentColumn->parameterPanels[pluginI]->parameterRows.size(); ++paramI) {
+            bool doingAnything = false;
+            auto v = currentColumn->parameterPanels[pluginI]->parameterRows[paramI]->currentValueSlider.getValue();
+            if (mappingPointColumns.size() >= 2) {
+                for (auto& column : mappingPointColumns) {
+                    if (pluginI < column->parameterPanels.size() &&
+                        paramI < column->parameterPanels[pluginI]->parameterRows.size() &&
+                        v != column->parameterPanels[pluginI]->parameterRows[paramI]->currentValueSlider.getValue()) {
+
+                        doingAnything = true;
+                        break;
+                    }
+                }
+            }
+
+            for (auto& column : mappingPointColumns) {
+                if (pluginI < column->parameterPanels.size() &&
+                    paramI < column->parameterPanels[pluginI]->parameterRows.size()) {
+                    column->parameterPanels[pluginI]->parameterRows[paramI]->setIsDoingAnything(doingAnything);
+                    }
+            }
+
+            currentColumn->parameterPanels[pluginI]->parameterRows[paramI]->setIsDoingAnything(doingAnything);
+        }
+    }
 }

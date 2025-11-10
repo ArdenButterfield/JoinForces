@@ -22,6 +22,9 @@ public:
     void paint(juce::Graphics &g) override;
     void setEditable(bool);
     void timerCallback() override;
+
+    std::vector<std::unique_ptr<PluginParametersPanel>> parameterPanels;
+
 private:
     int columnIndex;
     void rebuildParameterPanels();
@@ -29,7 +32,6 @@ private:
     MappingCenter& mappingCenter;
     MappingPoint& mappingPoint;
     PositionSliders positionSliders;
-    std::vector<std::unique_ptr<PluginParametersPanel>> parameterPanels;
     bool isCurrentParamColumn;
 };
 

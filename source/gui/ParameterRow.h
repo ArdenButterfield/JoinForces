@@ -18,9 +18,13 @@ public:
     ~ParameterRow() override;
     void paint(juce::Graphics &g) override;
     void resized() override;
-private:
-    Parameter& parameter;
+    void setIsDoingAnything(bool);
+
     CurrentParameterValueSlider currentValueSlider;
+
+private:
+    bool isDoingAnything;
+    Parameter& parameter;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(ParameterRow)
 };

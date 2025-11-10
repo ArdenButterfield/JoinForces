@@ -20,11 +20,13 @@ public:
     void resized() override;
     void paint(juce::Graphics &g) override;
     void updateDisplay();
+
+    std::vector<std::unique_ptr<ParameterRow>> parameterRows;
+
 private:
     PluginParameterSet& parameterSet;
 
     juce::TextButton openEditorButton;
-    std::vector<std::unique_ptr<ParameterRow>> parameterRows;
     const juce::AudioProcessorGraph::NodeID nodeID;
     std::unique_ptr<SubpluginWindow> subpluginWindow;
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(PluginParametersPanel)
