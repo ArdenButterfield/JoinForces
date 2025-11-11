@@ -78,7 +78,7 @@ PluginEditor::PluginEditor (PluginProcessor& p)
 
     // Make sure that before the constructor has finished, you've set the
     // editor's size to whatever you need it to be.
-    setSize (400, 300);
+    setSize (processorRef.editorRememberedSize.getX(), processorRef.editorRememberedSize.getY());
 
     startTimerHz(30);
 
@@ -88,6 +88,8 @@ PluginEditor::PluginEditor (PluginProcessor& p)
 PluginEditor::~PluginEditor()
 {
     mappingViewport.setViewedComponent(nullptr);
+    processorRef.editorRememberedSize.setXY(getWidth(), getHeight());
+
 }
 
 void PluginEditor::paint (juce::Graphics& g)

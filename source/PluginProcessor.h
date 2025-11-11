@@ -49,6 +49,7 @@ public:
         return &forceFeedbackInterface;
     }
 
+    juce::Point<int> editorRememberedSize;
 private:
     ForceFeedbackInterface forceFeedbackInterface;
     MappingCenter mappingCenter;

@@ -14,7 +14,7 @@
 
 #include "PluginParametersPanel.h"
 
-class SliderColumn : public juce::Component, public juce::Timer {
+class   SliderColumn : public juce::Component, public juce::Timer {
 public:
     SliderColumn(MappingCenter&, MappingPoint&, int columnIndex);
     ~SliderColumn();
