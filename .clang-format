@@ -30,7 +30,7 @@ BraceWrapping: # Allman except for lambdas
   AfterNamespace: true
   AfterStruct: true
   BeforeElse: true
-  AfterControlStatement: Always
+  AfterControlStatement: Never
   BeforeLambdaBody: false
 BreakBeforeTernaryOperators: true
 BreakConstructorInitializersBeforeComma: false

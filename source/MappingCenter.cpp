@@ -14,7 +14,13 @@ MappingCenter::MappingCenter(const juce::AudioProcessor::BusesLayout &layout, Fo
         xParam(new juce::AudioParameterFloat(juce::ParameterID{"x", 1}, "x", 0, 1, 0)),
         yParam(new juce::AudioParameterFloat( juce::ParameterID{"y", 1}, "y", 0, 1, 0)),
         zParam(new juce::AudioParameterFloat(juce::ParameterID{"z", 1}, "z", 0, 1, 0)),
-        busesLayout(layout), pluginGroup(layout), ffInterface(_interface), inputEnabled(true), mappingPointAttractionForce(0,0,0), wallPushbackForce(0,0,0) {
+        busesLayout(layout),
+        pluginGroup(layout),
+        ffInterface(_interface),
+        inputEnabled(true),
+        mappingPointAttractionForce(0,0,0),
+        wallPushbackForce(0,0,0)
+{
     xParam->addListener(this);
     yParam->addListener(this);
     zParam->addListener(this);
@@ -158,8 +164,11 @@ float MappingCenter::closeness(juce::Vector3D<float> a, juce::Vector3D<float> b)
 }
 
 
-void MappingCenter::calculateCurrentMapping() {
-    std::vector<float> distances;
+void MappingCenter::getDistancesAndWeights(std::vector<float> &distances, std::vector<float> &weights) const
+{
+    distances.clear();
+    weights.clear();
+
     auto minDistance = 9999999.9f;
     auto minIndex = -1;
     for (auto& mapping : mappings) {
@@ -171,7 +180,6 @@ void MappingCenter::calculateCurrentMapping() {
         }
     }
 
-    std::vector<float> weights;
     weights.resize(distances.size());
 
     if (minDistance < 0.00001) {
@@ -188,7 +196,12 @@ void MappingCenter::calculateCurrentMapping() {
             weight /= weightSum;
         }
     }
+}
 
+void MappingCenter::calculateCurrentMapping() {
+    std::vector<float> distances;
+    std::vector<float> weights;
+    getDistancesAndWeights (distances, weights);
 
     if (!mappings.empty()) {
         auto currentMappingIt = currentMapping.pluginParameters.begin();
@@ -213,7 +226,6 @@ void MappingCenter::calculateCurrentMapping() {
                 ++it;
             }
         }
-
     }
 }
 
@@ -363,9 +375,7 @@ void MappingCenter::timerCallback() {
     recalculateForces();
 }
 
-juce::Vector3D<float> MappingCenter::calculateMappingPointAttractionForce(const juce::Vector3D<float>& atPoint) const {
-    const float eyeRadius = 0.01f;
-    const float eyeRadiusSquared = eyeRadius * eyeRadius;
+juce::Vector3D<float> MappingCenter::calculateMappingPointAttractionForce(const juce::Vector3D<float>& atPoint) {
 
     auto force = juce::Vector3D<float>(0,0,0);
 
@@ -383,8 +393,76 @@ juce::Vector3D<float> MappingCenter::calculateMappingPointAttractionForce(const 
 
 }
 
-juce::Vector3D<float> MappingCenter::calculateWallPushbackForce(const juce::Vector3D<float>& atPoint) const {
-    return {0,0,0};
+juce::Vector3D<float> MappingCenter::calculateWallPushbackForce(const juce::Vector3D<float>& atPoint) {
+    auto gradient = juce::Vector3D<float>(0,0,0);
+
+    if (mappings.empty()) {
+        return gradient;
+    }
+
+    std::vector<float> distances;
+    std::vector<float> weights;
+    std::vector<float> inverseDistances;
+    std::vector<juce::Vector3D<float>> positions;
+
+    getDistancesAndWeights(distances, weights);
+
+    for (const auto distance : distances) {
+        inverseDistances.push_back(1 / distance);
+    }
+
+    auto currentMappingIt = currentMapping.pluginParameters.begin();
+    std::vector<std::list<PluginParameterSet>::iterator> mappingPointIterators;
+    {
+        int i = 0;
+        for (auto& mapping : mappings) {
+            positions.push_back (mapping.position);
+            mappingPointIterators.push_back(mapping.pluginParameters.begin());
+            mapping.contributionWeight = weights[i];
+            ++i;
+        }
+    }
+    while (currentMappingIt != currentMapping.pluginParameters.end()) {
+        for (int i = 0; i < currentMappingIt->parameters.size(); ++i) {
+            bool parameterHasWalls = false;
+            if (currentMappingIt->parameters[i].parameter.isDiscrete()) {
+                auto v = currentMappingIt->parameters[i].value;
+                for (int j = 0; (!parameterHasWalls) && (j < mappingPointIterators.size()); ++j) {
+                    if (v != mappingPointIterators[j]->parameters[i].value) {
+                        parameterHasWalls = true;
+                    }
+                }
+            }
+            if (parameterHasWalls) {
+                float numerator = 0;
+                float denominator = 0;
+                juce::Vector3D<float> numeratorDerivatives = {0,0,0};
+                juce::Vector3D<float> denominatorDerivatives = {0,0,0};
+
+                for (int j = 0; j < mappingPointIterators.size(); ++j) {
+                    numerator += mappingPointIterators[j]->parameters[i].value * inverseDistances[j];
+                    denominator += inverseDistances[j];
+
+                    auto derivativeTerm = (positions[j] - currentMapping.position) * -1 * 2 * inverseDistances[j] * inverseDistances[j];
+
+                    numeratorDerivatives += derivativeTerm * mappingPointIterators[j]->parameters[i].value;
+                    denominatorDerivatives += derivativeTerm;
+                }
+
+                gradient += (numeratorDerivatives * denominator - denominatorDerivatives * numerator) / (denominator * denominator); // Product rule
+            }
+            for (int j = 0; j < mappingPointIterators.size(); ++j) {
+
+                currentMappingIt->parameters[i].value += mappingPointIterators[j]->parameters[i].value * weights[j];
+            }
+        }
+        ++currentMappingIt;
+        for (auto& it: mappingPointIterators) {
+            ++it;
+        }
+    }
+
+    return gradient;
 }
 
 void MappingCenter::recalculateForces() {

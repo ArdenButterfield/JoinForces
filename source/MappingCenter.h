@@ -60,8 +60,8 @@ public:
     [[nodiscard]] juce::Vector3D<float> getMappingPointAttractionForce() const;
     juce::Vector3D<float> getWallPushbackForce() const;
 
-    juce::Vector3D<float> calculateMappingPointAttractionForce(const juce::Vector3D<float>& atPoint) const;
-    juce::Vector3D<float> calculateWallPushbackForce(const juce::Vector3D<float>& atPoint) const;
+    juce::Vector3D<float> calculateMappingPointAttractionForce(const juce::Vector3D<float>& atPoint);
+    juce::Vector3D<float> calculateWallPushbackForce(const juce::Vector3D<float>& atPoint);
 
     juce::AudioParameterFloat* xParam;
     juce::AudioParameterFloat* yParam;
@@ -80,6 +80,7 @@ private:
     void parameterValueChanged(int parameterIndex, float newValue) override;
     void parameterGestureChanged(int parameterIndex, bool gestureIsStarting) override;
     static float closeness(juce::Vector3D<float> a, juce::Vector3D<float>b);
+    void getDistancesAndWeights (std::vector<float>& distances, std::vector<float>& weights) const;
     void insertInto(MappingPoint& mapping, const juce::File& file);
     void removeFrom(MappingPoint& mapping);
 
@@ -90,6 +91,9 @@ private:
     juce::CriticalSection criticalSection;
     juce::AudioProcessor::BusesLayout busesLayout;
     juce::AudioProcessor* getNthProcessor(int n);
+
+    const float eyeRadius = 0.01f;
+    const float eyeRadiusSquared = eyeRadius * eyeRadius;
 };
 
 
