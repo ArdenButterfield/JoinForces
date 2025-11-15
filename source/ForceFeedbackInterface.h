@@ -29,14 +29,10 @@ public:
     void setMappingCenter(MappingCenter*);
 private:
     MappingCenter* mappingCenter;
-    juce::Vector3D<float> getMappingPointAttractionForce() const;
     bool initialized;
     juce::Vector3D<float> position;
     HHD ghHD = HD_INVALID_HANDLE;
     HDSchedulerHandle schedulerHandle;
-
-    const float eyeRadius = 0.01f;
-    const float eyeRadiusSquared = eyeRadius * eyeRadius;
     const float positionEpsilon = 0.05f;
 
     int samplesWithoutSync;

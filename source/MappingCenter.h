@@ -32,7 +32,7 @@ struct MappingPoint {
     std::list<PluginParameterSet> pluginParameters;
 };
 
-class MappingCenter : public juce::AudioProcessorParameter::Listener {
+class MappingCenter : public juce::AudioProcessorParameter::Listener, public juce::Timer {
 public:
     MappingCenter(const juce::AudioProcessor::BusesLayout &layout, ForceFeedbackInterface& ffInterface);
     ~MappingCenter();
@@ -57,12 +57,26 @@ public:
     void exportToXml(juce::XmlElement& xml);
     void importFromXml(const juce::XmlElement& xml);
 
+    [[nodiscard]] juce::Vector3D<float> getMappingPointAttractionForce() const;
+    juce::Vector3D<float> getWallPushbackForce() const;
+
+    juce::Vector3D<float> calculateMappingPointAttractionForce(const juce::Vector3D<float>& atPoint) const;
+    juce::Vector3D<float> calculateWallPushbackForce(const juce::Vector3D<float>& atPoint) const;
+
     juce::AudioParameterFloat* xParam;
     juce::AudioParameterFloat* yParam;
     juce::AudioParameterFloat* zParam;
 
     bool inputEnabled;
+
+
 private:
+    juce::Vector3D<float> mappingPointAttractionForce;
+    juce::Vector3D<float> wallPushbackForce;
+
+    void timerCallback() override;
+    void recalculateForces();
+
     void parameterValueChanged(int parameterIndex, float newValue) override;
     void parameterGestureChanged(int parameterIndex, bool gestureIsStarting) override;
     static float closeness(juce::Vector3D<float> a, juce::Vector3D<float>b);

@@ -14,12 +14,14 @@ MappingCenter::MappingCenter(const juce::AudioProcessor::BusesLayout &layout, Fo
         xParam(new juce::AudioParameterFloat(juce::ParameterID{"x", 1}, "x", 0, 1, 0)),
         yParam(new juce::AudioParameterFloat( juce::ParameterID{"y", 1}, "y", 0, 1, 0)),
         zParam(new juce::AudioParameterFloat(juce::ParameterID{"z", 1}, "z", 0, 1, 0)),
-        busesLayout(layout), pluginGroup(layout), ffInterface(_interface), inputEnabled(true) {
+        busesLayout(layout), pluginGroup(layout), ffInterface(_interface), inputEnabled(true), mappingPointAttractionForce(0,0,0), wallPushbackForce(0,0,0) {
     xParam->addListener(this);
     yParam->addListener(this);
     zParam->addListener(this);
 
     ffInterface.setMappingCenter(this);
+
+    startTimerHz(60);
 }
 
 MappingCenter::~MappingCenter() {
@@ -349,6 +351,47 @@ void MappingCenter::importFromXml(const juce::XmlElement &xml) {
     criticalSection.exit();
 }
 
+juce::Vector3D<float> MappingCenter::getMappingPointAttractionForce() const {
+    return mappingPointAttractionForce;
+}
+
+juce::Vector3D<float> MappingCenter::getWallPushbackForce() const {
+    return wallPushbackForce;
+}
+
+void MappingCenter::timerCallback() {
+    recalculateForces();
+}
+
+juce::Vector3D<float> MappingCenter::calculateMappingPointAttractionForce(const juce::Vector3D<float>& atPoint) const {
+    const float eyeRadius = 0.01f;
+    const float eyeRadiusSquared = eyeRadius * eyeRadius;
+
+    auto force = juce::Vector3D<float>(0,0,0);
+
+    for (const auto& mapping : mappings) {
+        auto vectorToPos = mapping.position - atPoint;
+        auto lSquared = vectorToPos.lengthSquared();
+
+        if (lSquared < eyeRadiusSquared) {
+            return {0,0,0};
+        }
+
+        force += vectorToPos * eyeRadius / lSquared;
+    }
+    return force;
+
+}
+
+juce::Vector3D<float> MappingCenter::calculateWallPushbackForce(const juce::Vector3D<float>& atPoint) const {
+    return {0,0,0};
+}
+
+void MappingCenter::recalculateForces() {
+    mappingPointAttractionForce = calculateMappingPointAttractionForce(currentMapping.position);
+    wallPushbackForce = calculateWallPushbackForce(currentMapping.position);
+}
+
 void MappingCenter::parameterValueChanged(int parameterIndex, float newValue) {
     if (!inputEnabled) {
         currentMapping.position.x = *xParam;
@@ -358,6 +401,7 @@ void MappingCenter::parameterValueChanged(int parameterIndex, float newValue) {
 }
 
 void MappingCenter::parameterGestureChanged(int parameterIndex, bool gestureIsStarting) {
+
 }
 
 juce::AudioProcessor* MappingCenter::getNthProcessor(int n) {

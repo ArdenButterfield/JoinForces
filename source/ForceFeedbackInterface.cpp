@@ -87,7 +87,7 @@ HDCallbackCode ForceFeedbackInterface::callback() {
 
     HDdouble force[3] = {0,0,0};
 
-    auto attractionForce = getMappingPointAttractionForce();
+    auto attractionForce = mappingCenter->getMappingPointAttractionForce();
     force[0] += attractionForce.x;
     force[1] += attractionForce.y;
     force[2] += attractionForce.z;
@@ -106,28 +106,6 @@ bool ForceFeedbackInterface::isInitialized() {
 
 void ForceFeedbackInterface::setMappingCenter(MappingCenter* mc) {
     mappingCenter = mc;
-}
-
-juce::Vector3D<float> ForceFeedbackInterface::getMappingPointAttractionForce() const {
-    auto force = juce::Vector3D<float>(0,0,0);
-    if (mappingCenter == nullptr) {
-        return force;
-    }
-
-    auto currentPos = mappingCenter->getCurrentMapping().position;
-
-
-    for (auto mapping : mappingCenter->getMappings()) {
-        auto vectorToPos = mapping.position - currentPos;
-        auto lSquared = vectorToPos.lengthSquared();
-
-        if (lSquared < eyeRadiusSquared) {
-            return {0,0,0};
-        }
-
-            force += vectorToPos * eyeRadius / lSquared;
-    }
-    return force;
 }
 
 HDCallbackCode ffCallback(void *data) {
