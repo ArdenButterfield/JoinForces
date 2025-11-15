@@ -8,7 +8,7 @@
 #include "ForceFeedbackInterface.h"
 
 #include "PluginGroup.h"
-#include "juce_dsp/maths/juce_FastMathApproximations.h"
+#include "juce_dsp/juce_dsp.h"
 
 MappingCenter::MappingCenter(const juce::AudioProcessor::BusesLayout &layout, ForceFeedbackInterface &_interface) :
         xParam(new juce::AudioParameterFloat(juce::ParameterID{"x", 1}, "x", 0, 1, 0)),

@@ -21,7 +21,7 @@ private:
     void resized() override;
     void timerCallback() override;
     juce::Rectangle<int> usableBounds;
-    juce::Colour getColour(juce::Vector3D<float>& position);
+    static juce::Colour getColour(juce::Vector3D<float>& position);
 };
 
 

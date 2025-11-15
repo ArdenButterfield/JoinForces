@@ -5,7 +5,6 @@
 #include "PositionsVisualizer.h"
 
 #include "../MappingCenter.h"
-#include "juce_audio_plugin_client/Standalone/juce_StandaloneFilterWindow.h"
 
 PositionsVisualizer::PositionsVisualizer(MappingCenter& mc) : mappingCenter(mc) {
     startTimerHz(30);
@@ -19,17 +18,21 @@ void PositionsVisualizer::paint(juce::Graphics &g) {
 
     g.fillAll(juce::Colours::black);
 
-    const auto gridResolution = 5.f;
+    constexpr auto gridResolution = 2;
+    const auto invW = 1.f / static_cast<float>(usableBounds.getWidth());
+    const auto invH = 1.f / static_cast<float>(usableBounds.getHeight());
     auto colour = getColour(currentPos);
-    for (float x = 0; x < getWidth(); x += gridResolution) {
-        for (float y = 0; y < getHeight(); y += gridResolution) {
+    for (int x = 0; x < usableBounds.getWidth(); x += gridResolution) {
+        for (int y = 0; y < usableBounds.getHeight(); y += gridResolution) {
             auto force = mappingCenter.calculateMappingPointAttractionForce(
-                {(x + gridResolution * 0.5f) / getWidth(), (y + gridResolution * 0.5f) / getHeight(), currentPos.z});
+                {(static_cast<float>(x) + gridResolution * 0.5f) * invW,
+                    (static_cast<float>(y) + gridResolution * 0.5f) * invH,
+                    currentPos.z});
             auto l = force.length();
-            g.setColour(colour.withBrightness(l));
-            int w = std::min(static_cast<int>(x + gridResolution), getWidth());
-            int h = std::min(static_cast<int>(y + gridResolution), getHeight());
-            g.drawRect(static_cast<int>(x), static_cast<int>(y), w, h);
+            g.setColour(juce::Colours::white.withBrightness(l * 3));
+            int w = std::min((x + gridResolution), usableBounds.getWidth()) - x;
+            int h = std::min((y + gridResolution), usableBounds.getHeight()) - y;
+            g.fillRect(x + usableBounds.getX(), usableBounds.getBottom() - y - gridResolution, w, h);
         }
     }
 
@@ -72,7 +75,8 @@ void PositionsVisualizer::drawSymbol(juce::Graphics &g, juce::Vector3D<float> &p
 }
 
 void PositionsVisualizer::resized() {
-    usableBounds = getLocalBounds().reduced(20, 20).withCentre(getLocalBounds().getCentre());
+    auto sidelengh = std::min(getWidth(), getHeight());
+    usableBounds = getLocalBounds().withSizeKeepingCentre (sidelengh, sidelengh);
 }
 
 void PositionsVisualizer::timerCallback() {
