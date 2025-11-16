@@ -16,5 +16,4 @@ SubpluginWindow::SubpluginWindow(juce::AudioProcessor& ap) :
 }
 
 SubpluginWindow::~SubpluginWindow() {
-    std::cout << "byebye\n";
 }

@@ -35,7 +35,6 @@ void MappingsPanel::paint(juce::Graphics &g) {
 }
 
 void MappingsPanel::resized() {
-    std::cout << "map center " << getWidth() << " " << getHeight() << std::endl;
     int x = 0;
     parameterNamesColumn->setTopLeftPosition(x,0);
     x += JoinForcesLookFeel::getNamesColumnWidth();
@@ -45,11 +44,6 @@ void MappingsPanel::resized() {
         mappingPointColumn->setTopLeftPosition(x, 0);
         x += JoinForcesLookFeel::getColumnWidth();
     }
-    std::cout << parameterNamesColumn->getX() << " " << currentColumn->getX() << " ";
-    for (const auto & mappingPointColumn : mappingPointColumns) {
-        std::cout << mappingPointColumn->getX() << " ";
-    }
-    std::cout << std::endl;
     positionsVisualizer->setBounds(parameterNamesColumn->getBounds().withHeight(JoinForcesLookFeel::getPositionVizHeight()));
 }
 
