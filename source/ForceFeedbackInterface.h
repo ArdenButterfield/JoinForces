@@ -27,6 +27,7 @@ public:
     bool isInitialized();
 
     void setMappingCenter(MappingCenter*);
+
 private:
     MappingCenter* mappingCenter;
     bool initialized;

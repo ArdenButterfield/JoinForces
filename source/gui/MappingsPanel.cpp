@@ -82,7 +82,7 @@ void MappingsPanel::setDoingAnythings() {
                 for (auto& column : mappingPointColumns) {
                     if (pluginI < column->parameterPanels.size() &&
                         paramI < column->parameterPanels[pluginI]->parameterRows.size() &&
-                        !juce::approximatelyEqual(v, column->parameterPanels[pluginI]->parameterRows[paramI]->currentValueSlider.getValue())) {
+                        std::abs(v - column->parameterPanels[pluginI]->parameterRows[paramI]->currentValueSlider.getValue()) > 0.005) {
 
                         doingAnything = true;
                         break;

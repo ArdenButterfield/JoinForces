@@ -2,7 +2,7 @@
 #include <iostream>
 
 PluginEditor::PluginEditor (PluginProcessor& p)
-    : AudioProcessorEditor (&p), processorRef (p), mappingsPanel (*p.getMappingCenter())
+    : AudioProcessorEditor (&p), processorRef (p), mappingsPanel (*p.getMappingCenter()), forceAmountSliders (*p.getMappingCenter())
 {
     addAndMakeVisible (inspectButton);
 
@@ -16,6 +16,8 @@ PluginEditor::PluginEditor (PluginProcessor& p)
 
         inspector->setVisible (true);
     };
+
+    addAndMakeVisible (forceAmountSliders);
 
     addAndMakeVisible(mappingViewport);
     mappingViewport.setViewedComponent(&mappingsPanel, false);
@@ -115,7 +117,11 @@ void PluginEditor::resized()
 
     mappingViewport.setBounds(usableArea.withTrimmedTop(addPluginButton.getBottom() + 10));
 
-
+    forceAmountSliders.setBounds (getLocalBounds()
+        .withLeft (createMappingButton.getRight() + 10)
+        .withBottom (mappingViewport.getY() - 10)
+        .withTop (importFromClipboardButton.getBottom() + 10)
+        .withRight (inputEnabledButton.getRight()));
 }
 
 void PluginEditor::buttonClicked(juce::Button *) {

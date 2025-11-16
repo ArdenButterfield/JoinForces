@@ -11,9 +11,17 @@
 #include "juce_dsp/juce_dsp.h"
 
 MappingCenter::MappingCenter(const juce::AudioProcessor::BusesLayout &layout, ForceFeedbackInterface &_interface) :
-        xParam(new juce::AudioParameterFloat(juce::ParameterID{"x", 1}, "x", 0, 1, 0)),
-        yParam(new juce::AudioParameterFloat( juce::ParameterID{"y", 1}, "y", 0, 1, 0)),
-        zParam(new juce::AudioParameterFloat(juce::ParameterID{"z", 1}, "z", 0, 1, 0)),
+        xParam(new juce::AudioParameterFloat(juce::ParameterID{"x", 1},
+            "x", 0, 1, 0)),
+        yParam(new juce::AudioParameterFloat( juce::ParameterID{"y", 1},
+            "y", 0, 1, 0)),
+        zParam(new juce::AudioParameterFloat(juce::ParameterID{"z", 1},
+            "z", 0, 1, 0)),
+        amountOfWallFeedback (new juce::AudioParameterFloat(juce::ParameterID{"wallfeedback", 1},
+            "Wall feedback", 0, 1, 1)),
+        amountOfPointFeedback (new juce::AudioParameterFloat(juce::ParameterID{"pointfeedback", 1},
+            "Point feedback", -1, 1, 0.5)),
+
         busesLayout(layout),
         pluginGroup(layout),
         ffInterface(_interface),
@@ -24,6 +32,9 @@ MappingCenter::MappingCenter(const juce::AudioProcessor::BusesLayout &layout, Fo
     xParam->addListener(this);
     yParam->addListener(this);
     zParam->addListener(this);
+
+    amountOfWallFeedback->addListener(this);
+    amountOfPointFeedback->addListener(this);
 
     ffInterface.setMappingCenter(this);
 
@@ -37,7 +48,7 @@ MappingCenter::~MappingCenter() {
 }
 
 void MappingCenter::createMappingAtCurrentState() {
-        criticalSection.enter();
+    criticalSection.enter();
     auto newMapping = MappingPoint();
     newMapping.position = ffInterface.getCurrentPosition();
     for (auto plugin : currentMapping.pluginParameters) {
@@ -83,12 +94,14 @@ void MappingCenter::processBlock(juce::AudioBuffer<float>& buffer,
 
 int MappingCenter::addPlugin(const juce::File &file, juce::String &errorMessage) {
     auto res = pluginGroup.addPlugin(file, errorMessage);
+
     if (res != nullptr) {
         insertInto(currentMapping, file);
         for (auto& mapping : mappings) {
             insertInto(mapping, file);
         }
     }
+
     return res == nullptr;
 }
 
@@ -126,7 +139,9 @@ void MappingCenter::groupUpdated(const PluginGroup &g) {
 
 void MappingCenter::insertInto(MappingPoint &mapping, const juce::File& file) {
     criticalSection.enter();
+
     auto it = mapping.pluginParameters.begin();
+
     for (auto nodeId : pluginGroup.getNodes()) {
         auto processor = pluginGroup.getAudioProcessorGraph().getNodeForId(nodeId)->getProcessor();
         if (it == mapping.pluginParameters.end() || processor != &(it->processor)) {
@@ -140,11 +155,14 @@ void MappingCenter::insertInto(MappingPoint &mapping, const juce::File& file) {
         }
         ++it;
     }
+    criticalSection.exit();
 }
 
 void MappingCenter::removeFrom(MappingPoint &mapping) {
     criticalSection.enter();
+
     auto it = mapping.pluginParameters.begin();
+
     for (auto nodeId : pluginGroup.getNodes()) {
         auto processor = pluginGroup.getAudioProcessorGraph().getNodeForId(nodeId)->getProcessor();
         if (processor != &(it->processor)) {
@@ -236,7 +254,9 @@ void MappingCenter::exportToXml(juce::XmlElement &xml) {
     currentPosition->setAttribute("x", currentMapping.position.x);
     currentPosition->setAttribute("y", currentMapping.position.y);
     currentPosition->setAttribute("z", currentMapping.position.z);
+
     auto currentPlugins = currentState->createNewChildElement("plugins");
+
     for (auto& plugin : currentMapping.pluginParameters) {
         auto p = currentPlugins->createNewChildElement("plugin");
         p->setAttribute("path", plugin.file.getFullPathName());
@@ -245,14 +265,18 @@ void MappingCenter::exportToXml(juce::XmlElement &xml) {
             par->setAttribute("param_" + juce::String(param.parameter.getParameterIndex()), param.value);
         }
     }
+
     auto mapPositions = mapping->createNewChildElement("map-positions");
+
     for (auto& mapPoint : mappings) {
         auto mp = mapPositions->createNewChildElement("map-point");
         auto mpPosition = mp->createNewChildElement("position");
         mpPosition->setAttribute("x", mapPoint.position.x);
         mpPosition->setAttribute("y", mapPoint.position.y);
         mpPosition->setAttribute("z", mapPoint.position.z);
+
         auto mpPplugins = mp->createNewChildElement("plugins");
+
         for (auto& plugin : mapPoint.pluginParameters) {
             auto p = mpPplugins->createNewChildElement("plugin");
             p->setAttribute("path", plugin.file.getFullPathName());
@@ -362,6 +386,13 @@ void MappingCenter::importFromXml(const juce::XmlElement &xml) {
     }
     criticalSection.exit();
 }
+juce::Vector3D<float> MappingCenter::getForces()
+{
+    if (inputEnabled) {
+        return getMappingPointAttractionForce() * *amountOfPointFeedback + getWallPushbackForce() * *amountOfWallFeedback;
+    }
+    return { 0, 0, 0 };
+}
 
 juce::Vector3D<float> MappingCenter::getMappingPointAttractionForce() const {
     return mappingPointAttractionForce;
@@ -456,7 +487,7 @@ juce::Vector3D<float> MappingCenter::calculateWallPushbackForce(const juce::Vect
                 const auto numSteps = currentMappingIt->parameters[i].parameter.getNumSteps();
                 const auto normalizedGradient = parameterGradient.normalised();
                 const auto scaledParameterValue = std::fmodf(parameterValue * static_cast<float>(numSteps), 1.f);
-                const auto wallZoneWidth = 0.1f;
+                const auto wallZoneWidth = 0.1f * parameterGradient.length();
                 if ((parameterValue >= 0.5f / numSteps) && (parameterValue <= 1.f - 0.5f / numSteps)) {
                     if (scaledParameterValue >= 0 && scaledParameterValue < wallZoneWidth) {
                         // above a wall

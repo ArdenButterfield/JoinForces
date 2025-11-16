@@ -15,6 +15,9 @@ PluginProcessor::PluginProcessor()
     addParameter (mappingCenter.xParam);
     addParameter (mappingCenter.yParam);
     addParameter (mappingCenter.zParam);
+
+    addParameter (mappingCenter.amountOfPointFeedback);
+    addParameter (mappingCenter.amountOfWallFeedback);
 }
 
 PluginProcessor::~PluginProcessor()

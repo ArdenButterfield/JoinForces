@@ -3,6 +3,7 @@
 #include "PluginProcessor.h"
 #include "gui/MappingsPanel.h"
 #include "gui/PositionSliders.h"
+#include "gui/ForceAmountSliders.h"
 #include "juce_gui_basics/juce_gui_basics.h"
 
 #include "melatonin_inspector/melatonin_inspector.h"
@@ -31,6 +32,7 @@ private:
     MappingsPanel mappingsPanel;
     juce::TextButton addPluginButton;
     juce::Viewport mappingViewport;
+    ForceAmountSliders forceAmountSliders;
 
     std::unique_ptr<melatonin::Inspector> inspector;
     juce::TextButton inspectButton { "Inspect the UI" };

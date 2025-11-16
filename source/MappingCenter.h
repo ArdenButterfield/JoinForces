@@ -57,6 +57,8 @@ public:
     void exportToXml(juce::XmlElement& xml);
     void importFromXml(const juce::XmlElement& xml);
 
+    juce::Vector3D<float> getForces();
+
     [[nodiscard]] juce::Vector3D<float> getMappingPointAttractionForce() const;
     juce::Vector3D<float> getWallPushbackForce() const;
 
@@ -66,6 +68,9 @@ public:
     juce::AudioParameterFloat* xParam;
     juce::AudioParameterFloat* yParam;
     juce::AudioParameterFloat* zParam;
+
+    juce::AudioParameterFloat* amountOfWallFeedback;
+    juce::AudioParameterFloat* amountOfPointFeedback;
 
     bool inputEnabled;
 

@@ -25,7 +25,7 @@ public:
     }
 
     static int getPositionVizHeight() {
-        return 100;
+        return 170;
     }
 
     static int getSliderWidth() {

@@ -18,7 +18,7 @@ void PositionsVisualizer::paint(juce::Graphics &g) {
 
     g.fillAll(juce::Colours::black);
 
-    constexpr auto gridResolution = 1;
+    constexpr auto gridResolution = 2;
     const auto invW = 1.f / static_cast<float>(usableBounds.getWidth());
     const auto invH = 1.f / static_cast<float>(usableBounds.getHeight());
     auto colour = getColour(currentPos);
@@ -28,10 +28,12 @@ void PositionsVisualizer::paint(juce::Graphics &g) {
                     (static_cast<float>(y) + gridResolution * 0.5f) * invH,
                     currentPos.z);
 
-            auto pushbackForce = mappingCenter.calculateWallPushbackForce(probingPosition);
-            auto attractionForce = mappingCenter.calculateMappingPointAttractionForce (probingPosition);
+            auto wallForce = mappingCenter.calculateWallPushbackForce(probingPosition);
+            auto pointForce = mappingCenter.calculateMappingPointAttractionForce (probingPosition);
 
-            g.setColour(juce::Colours::white.withBrightness(pushbackForce.length() * 0.8));
+            auto totalForce = wallForce* *mappingCenter.amountOfWallFeedback +
+                pointForce * *mappingCenter.amountOfPointFeedback;
+            g.setColour(juce::Colours::white.withBrightness(totalForce.length() * 0.8));
 
             int w = std::min((x + gridResolution), usableBounds.getWidth()) - x;
             int h = std::min((y + gridResolution), usableBounds.getHeight()) - y;
