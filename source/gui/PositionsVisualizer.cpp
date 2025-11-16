@@ -24,14 +24,18 @@ void PositionsVisualizer::paint(juce::Graphics &g) {
     auto colour = getColour(currentPos);
     for (int x = 0; x < usableBounds.getWidth(); x += gridResolution) {
         for (int y = 0; y < usableBounds.getHeight(); y += gridResolution) {
-            auto force = mappingCenter.calculateMappingPointAttractionForce(
-                {(static_cast<float>(x) + gridResolution * 0.5f) * invW,
+            auto probingPosition = juce::Vector3D<float>((static_cast<float>(x) + gridResolution * 0.5f) * invW,
                     (static_cast<float>(y) + gridResolution * 0.5f) * invH,
-                    currentPos.z});
-            auto l = force.length();
-            g.setColour(juce::Colours::white.withBrightness(l * 3));
+                    currentPos.z);
+
+            auto pushbackForce = mappingCenter.calculateWallPushbackForce(probingPosition);
+            auto attractionForce = mappingCenter.calculateMappingPointAttractionForce (probingPosition);
+
+            g.setColour(juce::Colours::white.withBrightness(pushbackForce.length() * 0.1));
+
             int w = std::min((x + gridResolution), usableBounds.getWidth()) - x;
             int h = std::min((y + gridResolution), usableBounds.getHeight()) - y;
+
             g.fillRect(x + usableBounds.getX(), usableBounds.getBottom() - y - gridResolution, w, h);
         }
     }

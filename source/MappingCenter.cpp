@@ -164,7 +164,7 @@ float MappingCenter::closeness(juce::Vector3D<float> a, juce::Vector3D<float> b)
 }
 
 
-void MappingCenter::getDistancesAndWeights(std::vector<float> &distances, std::vector<float> &weights) const
+void MappingCenter::getDistancesAndWeights(std::vector<float> &distances, std::vector<float> &weights, const juce::Vector3D<float>& position) const
 {
     distances.clear();
     weights.clear();
@@ -172,7 +172,7 @@ void MappingCenter::getDistancesAndWeights(std::vector<float> &distances, std::v
     auto minDistance = 9999999.9f;
     auto minIndex = -1;
     for (auto& mapping : mappings) {
-        auto difference = mapping.position - currentMapping.position;
+        auto difference = mapping.position - position;
         distances.push_back(difference.lengthSquared());
         if (distances.back() < minDistance) {
             minDistance = distances.back();
@@ -201,7 +201,7 @@ void MappingCenter::getDistancesAndWeights(std::vector<float> &distances, std::v
 void MappingCenter::calculateCurrentMapping() {
     std::vector<float> distances;
     std::vector<float> weights;
-    getDistancesAndWeights (distances, weights);
+    getDistancesAndWeights (distances, weights, currentMapping.position);
 
     if (!mappings.empty()) {
         auto currentMappingIt = currentMapping.pluginParameters.begin();
@@ -375,7 +375,7 @@ void MappingCenter::timerCallback() {
     recalculateForces();
 }
 
-juce::Vector3D<float> MappingCenter::calculateMappingPointAttractionForce(const juce::Vector3D<float>& atPoint) {
+juce::Vector3D<float> MappingCenter::calculateMappingPointAttractionForce(const juce::Vector3D<float>& atPoint) const {
 
     auto force = juce::Vector3D<float>(0,0,0);
 
@@ -393,7 +393,7 @@ juce::Vector3D<float> MappingCenter::calculateMappingPointAttractionForce(const 
 
 }
 
-juce::Vector3D<float> MappingCenter::calculateWallPushbackForce(const juce::Vector3D<float>& atPoint) {
+juce::Vector3D<float> MappingCenter::calculateWallPushbackForce(const juce::Vector3D<float>& atPoint) const {
     auto gradient = juce::Vector3D<float>(0,0,0);
 
     if (mappings.empty()) {
@@ -405,20 +405,19 @@ juce::Vector3D<float> MappingCenter::calculateWallPushbackForce(const juce::Vect
     std::vector<float> inverseDistances;
     std::vector<juce::Vector3D<float>> positions;
 
-    getDistancesAndWeights(distances, weights);
+    getDistancesAndWeights(distances, weights, atPoint);
 
     for (const auto distance : distances) {
         inverseDistances.push_back(1 / distance);
     }
 
     auto currentMappingIt = currentMapping.pluginParameters.begin();
-    std::vector<std::list<PluginParameterSet>::iterator> mappingPointIterators;
+    std::vector<std::list<PluginParameterSet>::const_iterator> mappingPointIterators;
     {
         int i = 0;
         for (auto& mapping : mappings) {
             positions.push_back (mapping.position);
             mappingPointIterators.push_back(mapping.pluginParameters.begin());
-            mapping.contributionWeight = weights[i];
             ++i;
         }
     }
@@ -443,17 +442,13 @@ juce::Vector3D<float> MappingCenter::calculateWallPushbackForce(const juce::Vect
                     numerator += mappingPointIterators[j]->parameters[i].value * inverseDistances[j];
                     denominator += inverseDistances[j];
 
-                    auto derivativeTerm = (positions[j] - currentMapping.position) * -1 * 2 * inverseDistances[j] * inverseDistances[j];
+                    auto derivativeTerm = (positions[j] - atPoint) * 2 * inverseDistances[j] * inverseDistances[j];
 
                     numeratorDerivatives += derivativeTerm * mappingPointIterators[j]->parameters[i].value;
                     denominatorDerivatives += derivativeTerm;
                 }
 
-                gradient += (numeratorDerivatives * denominator - denominatorDerivatives * numerator) / (denominator * denominator); // Product rule
-            }
-            for (int j = 0; j < mappingPointIterators.size(); ++j) {
-
-                currentMappingIt->parameters[i].value += mappingPointIterators[j]->parameters[i].value * weights[j];
+                gradient += (numeratorDerivatives * denominator - denominatorDerivatives * numerator) / (denominator * denominator); // Quotient rule
             }
         }
         ++currentMappingIt;
