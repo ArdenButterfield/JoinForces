@@ -394,10 +394,10 @@ juce::Vector3D<float> MappingCenter::calculateMappingPointAttractionForce(const 
 }
 
 juce::Vector3D<float> MappingCenter::calculateWallPushbackForce(const juce::Vector3D<float>& atPoint) const {
-    auto gradient = juce::Vector3D<float>(0,0,0);
+    auto force = juce::Vector3D<float>(0,0,0);
 
     if (mappings.empty()) {
-        return gradient;
+        return force;
     }
 
     std::vector<float> distances;
@@ -424,7 +424,9 @@ juce::Vector3D<float> MappingCenter::calculateWallPushbackForce(const juce::Vect
     while (currentMappingIt != currentMapping.pluginParameters.end()) {
         for (int i = 0; i < currentMappingIt->parameters.size(); ++i) {
             bool parameterHasWalls = false;
-            if (currentMappingIt->parameters[i].parameter.isDiscrete()) {
+            if (currentMappingIt->parameters[i].parameter.isDiscrete()
+                && currentMappingIt->parameters[i].parameter.getNumSteps() >= 2
+                && currentMappingIt->parameters[i].parameter.getNumSteps() < 100) {
                 auto v = currentMappingIt->parameters[i].value;
                 for (int j = 0; (!parameterHasWalls) && (j < mappingPointIterators.size()); ++j) {
                     if (v != mappingPointIterators[j]->parameters[i].value) {
@@ -442,13 +444,28 @@ juce::Vector3D<float> MappingCenter::calculateWallPushbackForce(const juce::Vect
                     numerator += mappingPointIterators[j]->parameters[i].value * inverseDistances[j];
                     denominator += inverseDistances[j];
 
-                    auto derivativeTerm = (positions[j] - atPoint) * 2 * inverseDistances[j] * inverseDistances[j];
+                    const auto derivativeTerm = (positions[j] - atPoint) * 2 * inverseDistances[j] * inverseDistances[j];
 
                     numeratorDerivatives += derivativeTerm * mappingPointIterators[j]->parameters[i].value;
                     denominatorDerivatives += derivativeTerm;
                 }
 
-                gradient += (numeratorDerivatives * denominator - denominatorDerivatives * numerator) / (denominator * denominator); // Quotient rule
+                const auto parameterGradient = (numeratorDerivatives * denominator - denominatorDerivatives * numerator) / (denominator * denominator); // Quotient rule
+                const auto parameterValue = numerator / denominator;
+
+                const auto numSteps = currentMappingIt->parameters[i].parameter.getNumSteps();
+                const auto normalizedGradient = parameterGradient.normalised();
+                const auto scaledParameterValue = std::fmodf(parameterValue * static_cast<float>(numSteps), 1.f);
+                const auto wallZoneWidth = 0.1f;
+                if ((parameterValue >= 0.5f / numSteps) && (parameterValue <= 1.f - 0.5f / numSteps)) {
+                    if (scaledParameterValue >= 0 && scaledParameterValue < wallZoneWidth) {
+                        // above a wall
+                        force -= normalizedGradient * (1 - (scaledParameterValue / wallZoneWidth));
+                    } else if (scaledParameterValue <= 1 && scaledParameterValue > 1 - wallZoneWidth) {
+                        // below a wall
+                        force += normalizedGradient * (1 - ((1 - scaledParameterValue) / wallZoneWidth));
+                    }
+                }
             }
         }
         ++currentMappingIt;
@@ -457,7 +474,7 @@ juce::Vector3D<float> MappingCenter::calculateWallPushbackForce(const juce::Vect
         }
     }
 
-    return gradient;
+    return force;
 }
 
 void MappingCenter::recalculateForces() {
