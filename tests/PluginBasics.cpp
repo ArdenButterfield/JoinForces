@@ -172,6 +172,19 @@ TEST_CASE("Mappings", "[mappings]") {
     }
 }
 
+TEST_CASE("Normalizable range", "[normrange]")
+{
+    auto n = juce::NormalisableRange<float>(0, 12, 1);
+    auto a = n.snapToLegalValue ( n.convertFrom0to1 (0.5f/12.f - 0.001f));
+    auto b = n.snapToLegalValue ( n.convertFrom0to1 (0.5f/12.f + 0.001f));
+    auto c = n.snapToLegalValue ( n.convertFrom0to1 (1.5f/12.f - 0.001f));
+    auto d = n.snapToLegalValue ( n.convertFrom0to1 (1.5f/12.f + 0.001f));
+    REQUIRE( a == 0 );
+    REQUIRE( b == 1 );
+    REQUIRE( c == 1 );
+    REQUIRE( d == 2 );
+}
+
 #ifdef PAMPLEJUCE_IPP
     #include <ipp.h>
 

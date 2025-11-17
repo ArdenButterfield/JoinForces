@@ -57,7 +57,8 @@ public:
     void exportToXml(juce::XmlElement& xml);
     void importFromXml(const juce::XmlElement& xml);
 
-    juce::Vector3D<float> getForces();
+    juce::Vector3D<float> getForces() const;
+    juce::Vector3D<float> getForces(const juce::Vector3D<float>& atPoint) const;
 
     [[nodiscard]] juce::Vector3D<float> getMappingPointAttractionForce() const;
     juce::Vector3D<float> getWallPushbackForce() const;
@@ -97,7 +98,7 @@ private:
     juce::AudioProcessor::BusesLayout busesLayout;
     juce::AudioProcessor* getNthProcessor(int n);
 
-    const float eyeRadius = 0.01f;
+    const float eyeRadius = 0.03f;
     const float eyeRadiusSquared = eyeRadius * eyeRadius;
 };
 

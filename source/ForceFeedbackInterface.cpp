@@ -87,7 +87,7 @@ HDCallbackCode ForceFeedbackInterface::callback() {
 
     HDdouble force[3] = {0,0,0};
 
-    auto attractionForce = mappingCenter->getMappingPointAttractionForce();
+    auto attractionForce = mappingCenter->getForces({x, y, z}) * 2;
     force[0] += attractionForce.x;
     force[1] += attractionForce.y;
     force[2] += attractionForce.z;

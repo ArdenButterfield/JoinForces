@@ -38,7 +38,7 @@ MappingCenter::MappingCenter(const juce::AudioProcessor::BusesLayout &layout, Fo
 
     ffInterface.setMappingCenter(this);
 
-    startTimerHz(60);
+    startTimerHz(120);
 }
 
 MappingCenter::~MappingCenter() {
@@ -386,12 +386,22 @@ void MappingCenter::importFromXml(const juce::XmlElement &xml) {
     }
     criticalSection.exit();
 }
-juce::Vector3D<float> MappingCenter::getForces()
+
+
+
+juce::Vector3D<float> MappingCenter::getForces() const
 {
     if (inputEnabled) {
         return getMappingPointAttractionForce() * *amountOfPointFeedback + getWallPushbackForce() * *amountOfWallFeedback;
     }
     return { 0, 0, 0 };
+}
+juce::Vector3D<float> MappingCenter::getForces (const juce::Vector3D<float>& atPoint) const
+{
+    if (inputEnabled) {
+        return calculateMappingPointAttractionForce (atPoint) * *amountOfPointFeedback + calculateWallPushbackForce (atPoint) * *amountOfWallFeedback;
+    }
+    return {0,0,0};
 }
 
 juce::Vector3D<float> MappingCenter::getMappingPointAttractionForce() const {
@@ -471,14 +481,21 @@ juce::Vector3D<float> MappingCenter::calculateWallPushbackForce(const juce::Vect
                 juce::Vector3D<float> numeratorDerivatives = {0,0,0};
                 juce::Vector3D<float> denominatorDerivatives = {0,0,0};
 
+                float minValue = 1;
+                float maxValue = 0;
+
                 for (int j = 0; j < mappingPointIterators.size(); ++j) {
-                    numerator += mappingPointIterators[j]->parameters[i].value * inverseDistances[j];
+                    const auto parameterValue = mappingPointIterators[j]->parameters[i].value;
+                    numerator += parameterValue * inverseDistances[j];
                     denominator += inverseDistances[j];
 
                     const auto derivativeTerm = (positions[j] - atPoint) * 2 * inverseDistances[j] * inverseDistances[j];
 
-                    numeratorDerivatives += derivativeTerm * mappingPointIterators[j]->parameters[i].value;
+                    numeratorDerivatives += derivativeTerm * parameterValue;
                     denominatorDerivatives += derivativeTerm;
+
+                    minValue = std::min(minValue, parameterValue);
+                    maxValue = std::max(maxValue, parameterValue);
                 }
 
                 const auto parameterGradient = (numeratorDerivatives * denominator - denominatorDerivatives * numerator) / (denominator * denominator); // Quotient rule
@@ -486,16 +503,18 @@ juce::Vector3D<float> MappingCenter::calculateWallPushbackForce(const juce::Vect
 
                 const auto numSteps = currentMappingIt->parameters[i].parameter.getNumSteps();
                 const auto normalizedGradient = parameterGradient.normalised();
-                const auto scaledParameterValue = std::fmodf(parameterValue * static_cast<float>(numSteps), 1.f);
+
+
+                const auto scaledParameterValue = std::fmodf(parameterValue * static_cast<float>(numSteps - 1), 1.f);
                 const auto wallZoneWidth = 0.1f * parameterGradient.length();
-                if ((parameterValue >= 0.5f / numSteps) && (parameterValue <= 1.f - 0.5f / numSteps)) {
-                    if (scaledParameterValue >= 0 && scaledParameterValue < wallZoneWidth) {
-                        // above a wall
-                        force -= normalizedGradient * (1 - (scaledParameterValue / wallZoneWidth));
-                    } else if (scaledParameterValue <= 1 && scaledParameterValue > 1 - wallZoneWidth) {
-                        // below a wall
-                        force += normalizedGradient * (1 - ((1 - scaledParameterValue) / wallZoneWidth));
-                    }
+                if ((scaledParameterValue <= 0.5f) && (scaledParameterValue > 0.5f - wallZoneWidth)) {
+                    // below a wall
+                    auto amountBelowTheWall = 0.5f - scaledParameterValue;
+                    force -= normalizedGradient * (1 - (amountBelowTheWall / wallZoneWidth));
+                } else if ((scaledParameterValue >= 0.5f) && (scaledParameterValue < 0.5f + wallZoneWidth)) {
+                    // above a wall
+                    auto amountAboveTheWall = scaledParameterValue - 0.5f;
+                    force += normalizedGradient * (1 - (amountAboveTheWall / wallZoneWidth));
                 }
             }
         }
