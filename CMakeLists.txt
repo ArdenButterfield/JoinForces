@@ -116,13 +116,9 @@ file(GLOB_RECURSE SourceFiles CONFIGURE_DEPENDS
 target_sources(SharedCode INTERFACE ${SourceFiles})
 
 target_include_directories(SharedCode INTERFACE
-        ${CMAKE_SOURCE_DIR}/freeglut-MSVC-3.0.0-2.mp/freeglut/include
         ${CMAKE_SOURCE_DIR}/OpenHaptics/Developer/3.5.0/include
         ${CMAKE_SOURCE_DIR}/OpenHaptics/Developer/3.5.0/utilities/include
 )
-
-find_package(OpenGL REQUIRED)
-include_directories( ${OPENGL_INCLUDE_DIRS} )
 
 #target_link_libraries(
 #        SharedCode INTERFACE
@@ -178,12 +174,8 @@ target_link_libraries(SharedCode
     juce::juce_recommended_config_flags
     juce::juce_recommended_lto_flags
     juce::juce_recommended_warning_flags
-    ${OPENGL_LIBRARIES}
     ${CMAKE_SOURCE_DIR}/OpenHaptics/Developer/3.5.0/lib/x64/${CMAKE_BUILD_TYPE}/hd.lib
     ${CMAKE_SOURCE_DIR}/OpenHaptics/Developer/3.5.0/lib/x64/${CMAKE_BUILD_TYPE}/hl.lib
-#    ${CMAKE_SOURCE_DIR}/OpenHaptics/Developer/3.5.0/utilities/lib/x64/${CMAKE_BUILD_TYPE}/hlu.lib
-#    ${CMAKE_SOURCE_DIR}/OpenHaptics/Developer/3.5.0/utilities/lib/x64/${CMAKE_BUILD_TYPE}/hdu.lib
-
 )
 
 # Link the JUCE plugin targets our SharedCode target
