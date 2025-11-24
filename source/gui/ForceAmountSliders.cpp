@@ -3,23 +3,33 @@
 //
 
 #include "ForceAmountSliders.h"
+
 #include "../MappingCenter.h"
+#include "JoinForcesLookFeel.h"
 
 ForceAmountSliders::ForceAmountSliders(MappingCenter& mc) : mappingCenter(mc)
 {
-    addAndMakeVisible (amountPointForceSlider);
-    addAndMakeVisible (amountWallForceSlider);
-    addAndMakeVisible (pointForceLabel);
-    addAndMakeVisible (wallForceLabel);
+    for (auto label : {&pointForceLabel, &wallForceLabel}) {
+        addAndMakeVisible (label);
+        label->setColour (juce::Label::textColourId, JoinForcesLookFeel::getTextColour());
+        label->setJustificationType (juce::Justification::centred);
+    }
 
-    amountWallForceSlider.addListener (this);
-    amountPointForceSlider.addListener (this);
+    for (auto slider : {&amountPointForceSlider, &amountWallForceSlider}) {
+        addAndMakeVisible (slider);
+
+        slider->setSliderStyle (juce::Slider::RotaryVerticalDrag);
+        slider->addListener (this);
+        slider->setTextBoxStyle (juce::Slider::TextBoxBelow, false, 50, 20);
+
+        slider->setColour (juce::Slider::textBoxOutlineColourId, juce::Colours::transparentBlack);
+        slider->setColour (juce::Slider::textBoxTextColourId, JoinForcesLookFeel::getTextColour());
+        slider->setColour (juce::Slider::thumbColourId, JoinForcesLookFeel::getBorderColour());
+        slider->setColour (juce::Slider::trackColourId, JoinForcesLookFeel::getBorderColour().withAlpha (0.2f));
+    }
 
     pointForceLabel.setText ("Point Force", juce::dontSendNotification);
     wallForceLabel.setText ("Wall Force", juce::dontSendNotification);
-
-    pointForceLabel.setJustificationType (juce::Justification::centred);
-    wallForceLabel.setJustificationType (juce::Justification::centred);
 
     amountPointForceSlider.setRange (
         mappingCenter.amountOfPointFeedback->range.start,
@@ -27,12 +37,6 @@ ForceAmountSliders::ForceAmountSliders(MappingCenter& mc) : mappingCenter(mc)
     amountWallForceSlider.setRange (
         mappingCenter.amountOfWallFeedback->range.start,
         mappingCenter.amountOfWallFeedback->range.end);
-
-    amountPointForceSlider.setSliderStyle (juce::Slider::RotaryVerticalDrag);
-    amountWallForceSlider.setSliderStyle (juce::Slider::RotaryVerticalDrag);
-
-    amountPointForceSlider.setTextBoxStyle (juce::Slider::TextBoxBelow, false, 50, 20);
-    amountWallForceSlider.setTextBoxStyle (juce::Slider::TextBoxBelow, false, 50, 20);
 
     startTimerHz (30);
 }
@@ -56,7 +60,7 @@ void ForceAmountSliders::timerCallback()
 
 void ForceAmountSliders::paint (juce::Graphics& g)
 {
-    g.setColour (juce::Colours::white);
+    g.setColour (JoinForcesLookFeel::getMidColour());
     g.drawRect (getLocalBounds());
 }
 void ForceAmountSliders::sliderValueChanged (juce::Slider*)

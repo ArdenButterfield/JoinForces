@@ -425,7 +425,7 @@ juce::Vector3D<float> MappingCenter::calculateMappingPointAttractionForce(const 
         auto lSquared = vectorToPos.lengthSquared();
 
         if (lSquared < eyeRadiusSquared) {
-            return {0,0,0};
+            return vectorToPos / eyeRadius;
         }
 
         force += vectorToPos * eyeRadius / lSquared;

@@ -43,6 +43,41 @@ public:
     static int getParameterRowHeight() {
         return 25;
     }
+
+    static juce::Colour getBackgroundColour()
+    {
+        return {229, 255, 222};
+    }
+
+    static juce::Colour getShadowColour()
+    {
+        return {187,203,203};
+    }
+
+    static juce::Colour getBorderColour()
+    {
+        return {99, 75, 102};
+    }
+
+    static juce::Colour getMidColour()
+    {
+        return {149,144,168};
+    }
+
+    static juce::Colour getTextColour()
+    {
+        return {24,2,12};
+    }
+
+    static juce::Colour getDiscreteParameterColour()
+    {
+        return juce::Colours::brown;
+    }
+
+    static juce::Colour getContinuousParameterColour()
+    {
+        return juce::Colours::darkgreen;
+    }
 };
 
 

@@ -26,9 +26,10 @@ void SliderColumn::resized() {
 
 void SliderColumn::paint(juce::Graphics &g) {
     if (isCurrentParamColumn) {
-        g.fillAll(juce::Colours::darkblue);
+        g.fillAll(JoinForcesLookFeel::getBackgroundColour());
     } else {
-        g.fillAll(juce::Colours::darkgreen.withSaturation(mappingPoint.contributionWeight));
+        g.fillAll(JoinForcesLookFeel::getBackgroundColour());
+        g.fillAll(JoinForcesLookFeel::getMidColour().withAlpha(mappingPoint.contributionWeight));
     }
 }
 

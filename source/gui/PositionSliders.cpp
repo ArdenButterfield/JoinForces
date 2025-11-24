@@ -22,8 +22,8 @@ PositionSliders::PositionSliders(juce::Vector3D<float>& p) : position(p) {
 PositionSliders::~PositionSliders() = default;
 
 void PositionSliders::paint(juce::Graphics &g) {
-    g.fillAll(juce::Colours::black);
-    g.setColour(juce::Colours::pink);
+    g.fillAll(JoinForcesLookFeel::getTextColour());
+    g.setColour(JoinForcesLookFeel::getBorderColour());
     g.drawRect(getLocalBounds(), 3);
 }
 

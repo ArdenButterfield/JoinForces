@@ -5,6 +5,7 @@
 #include "PositionsVisualizer.h"
 
 #include "../MappingCenter.h"
+#include "JoinForcesLookFeel.h"
 
 PositionsVisualizer::PositionsVisualizer(MappingCenter& mc) : mappingCenter(mc) {
     startTimerHz(30);
@@ -33,7 +34,7 @@ void PositionsVisualizer::paint(juce::Graphics &g) {
 
             auto totalForce = wallForce* *mappingCenter.amountOfWallFeedback +
                 pointForce * *mappingCenter.amountOfPointFeedback;
-            g.setColour(juce::Colours::white.withBrightness(totalForce.length() * 0.8));
+            g.setColour(JoinForcesLookFeel::getBackgroundColour().withBrightness(totalForce.length() * 0.8));
 
             int w = std::min((x + gridResolution), usableBounds.getWidth()) - x;
             int h = std::min((y + gridResolution), usableBounds.getHeight()) - y;
@@ -42,7 +43,7 @@ void PositionsVisualizer::paint(juce::Graphics &g) {
         }
     }
 
-    g.setColour(juce::Colours::white);
+    g.setColour(JoinForcesLookFeel::getMidColour());
 
     g.drawRect(getLocalBounds(), 3);
 

@@ -29,8 +29,8 @@ MappingsPanel::~MappingsPanel() {
 }
 
 void MappingsPanel::paint(juce::Graphics &g) {
-    g.fillAll(juce::Colours::black);
-    g.setColour(juce::Colours::white);
+    g.fillAll(JoinForcesLookFeel::getBackgroundColour());
+    g.setColour(JoinForcesLookFeel::getBorderColour());
     g.drawRoundedRectangle(getLocalBounds().toFloat(), 5, 3);
 }
 

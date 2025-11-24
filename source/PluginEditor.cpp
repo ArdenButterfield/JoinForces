@@ -1,4 +1,7 @@
 #include "PluginEditor.h"
+
+#include "gui/JoinForcesLookFeel.h"
+
 #include <iostream>
 
 PluginEditor::PluginEditor (PluginProcessor& p)
@@ -17,9 +20,15 @@ PluginEditor::PluginEditor (PluginProcessor& p)
         inspector->setVisible (true);
     };
 
-    addAndMakeVisible (forceAmountSliders);
+    for (auto button : {&addPluginButton, &inspectButton, &exportToClipboardButton, &importFromClipboardButton}) {
+        button->setColour (juce::TextButton::buttonColourId,    JoinForcesLookFeel::getBackgroundColour());
+        button->setColour(juce::TextButton::buttonOnColourId, JoinForcesLookFeel::getShadowColour());
+        button->setColour (juce::TextButton::textColourOffId, JoinForcesLookFeel::getTextColour());
+        button->setColour (juce::TextButton::textColourOnId, JoinForcesLookFeel::getTextColour());
+    }
 
-    addAndMakeVisible(mappingViewport);
+    addAndMakeVisible (forceAmountSliders);
+    addAndMakeVisible (mappingViewport);
     mappingViewport.setViewedComponent(&mappingsPanel, false);
 
     addAndMakeVisible(addPluginButton);
@@ -74,8 +83,8 @@ PluginEditor::PluginEditor (PluginProcessor& p)
     inputEnabledButton.addListener(this);
     addAndMakeVisible(inputEnabledButton);
     inputEnabledButton.setButtonText("Gestural Input Enabled");
-    inputEnabledButton.setColour(juce::ToggleButton::ColourIds::textColourId, juce::Colours::black);
-    inputEnabledButton.setColour(juce::ToggleButton::ColourIds::tickColourId, juce::Colours::black);
+    inputEnabledButton.setColour(juce::ToggleButton::ColourIds::textColourId, JoinForcesLookFeel::getTextColour());
+    inputEnabledButton.setColour(juce::ToggleButton::ColourIds::tickColourId, JoinForcesLookFeel::getTextColour());
 
 
     // Make sure that before the constructor has finished, you've set the
@@ -97,9 +106,9 @@ PluginEditor::~PluginEditor()
 void PluginEditor::paint (juce::Graphics& g)
 {
     // (Our component is opaque, so we must completely fill the background with a solid colour)
-    g.fillAll (getLookAndFeel().findColour (juce::ResizableWindow::backgroundColourId));
+    g.fillAll (JoinForcesLookFeel::getBackgroundColour());
 
-    g.setColour(juce::Colours::black);
+    g.setColour(JoinForcesLookFeel::getShadowColour());
     g.fillRect(mappingViewport.getBounds());
 }
 
