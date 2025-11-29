@@ -7,7 +7,11 @@
 #include "MappingCenter.h"
 
 ForceFeedbackInterface::ForceFeedbackInterface()
-: mappingCenter(nullptr), initialized(false), schedulerHandle(0) {
+: mappingCenter(nullptr), initialized(false),
+#if JUCE_WINDOWS
+schedulerHandle(0)
+#endif
+{
     samplesWithoutSync = 0;
 }
 
