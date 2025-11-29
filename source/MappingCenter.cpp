@@ -5,6 +5,7 @@
 #include "MappingCenter.h"
 
 #include <utility>
+#include <cmath>
 #include "ForceFeedbackInterface.h"
 
 #include "PluginGroup.h"
