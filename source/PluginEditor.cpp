@@ -46,7 +46,7 @@ PluginEditor::PluginEditor (PluginProcessor& p)
 #if JUCE_WINDOWS
                                        juce::File::getSpecialLocation (juce::File::globalApplicationsDirectory).getChildFile("Common Files").getChildFile("VST3"),
 #else
-                                       juce::File::getSpecialLocation(juce::File::globalApplicationsDirectory)
+                                       juce::File::getSpecialLocation(juce::File::globalApplicationsDirectory),
 #endif
                                        "*");
 
