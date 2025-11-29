@@ -106,16 +106,21 @@ include(SharedCodeDefaults)
 # Just ensure you employ CONFIGURE_DEPENDS so the build system picks up changes
 # If you want to appease the CMake gods and avoid globs, manually add files like so:
 # set(SourceFiles Source/PluginEditor.h Source/PluginProcessor.h Source/PluginEditor.cpp Source/PluginProcessor.cpp)
+
+if (MSVC)
+    set(OPENHAPTICS_SOURCES
+            "${CMAKE_CURRENT_SOURCE_DIR}/OpenHaptics/Developer/3.5.0/utilities/src/HDU/src/*.cpp" "${CMAKE_CURRENT_SOURCE_DIR}/OpenHaptics/Developer/3.5.0/utilities/src/HDU/src/*.h"
+            "${CMAKE_CURRENT_SOURCE_DIR}/OpenHaptics/Developer/3.5.0/utilities/src/HLU/src/*.cpp" "${CMAKE_CURRENT_SOURCE_DIR}/OpenHaptics/Developer/3.5.0/utilities/src/HLU/src/*.h"
+    )
+endif ()
+
 file(GLOB_RECURSE SourceFiles CONFIGURE_DEPENDS
         "${CMAKE_CURRENT_SOURCE_DIR}/source/*.cpp" "${CMAKE_CURRENT_SOURCE_DIR}/source/*.h"
-if (WIN32)
-        "${CMAKE_CURRENT_SOURCE_DIR}/OpenHaptics/Developer/3.5.0/utilities/src/HDU/src/*.cpp" "${CMAKE_CURRENT_SOURCE_DIR}/OpenHaptics/Developer/3.5.0/utilities/src/HDU/src/*.h"
-        "${CMAKE_CURRENT_SOURCE_DIR}/OpenHaptics/Developer/3.5.0/utilities/src/HLU/src/*.cpp" "${CMAKE_CURRENT_SOURCE_DIR}/OpenHaptics/Developer/3.5.0/utilities/src/HLU/src/*.h"
-endif()
+        ${OPENHAPTICS_SOURCES}
 )
 target_sources(SharedCode INTERFACE ${SourceFiles})
 
-if (WIN32)
+if (MSVC)
 target_include_directories(SharedCode INTERFACE
         ${CMAKE_SOURCE_DIR}/OpenHaptics/Developer/3.5.0/include
         ${CMAKE_SOURCE_DIR}/OpenHaptics/Developer/3.5.0/utilities/include
@@ -166,11 +171,15 @@ target_link_libraries(SharedCode
     juce::juce_recommended_config_flags
     juce::juce_recommended_lto_flags
     juce::juce_recommended_warning_flags
-if (WIN32)
+)
+
+if (MSVC)
+target_link_libraries(SharedCode
+    INTERFACE
     ${CMAKE_SOURCE_DIR}/OpenHaptics/Developer/3.5.0/lib/x64/${CMAKE_BUILD_TYPE}/hd.lib
     ${CMAKE_SOURCE_DIR}/OpenHaptics/Developer/3.5.0/lib/x64/${CMAKE_BUILD_TYPE}/hl.lib
-endif()
 )
+endif ()
 
 # Link the JUCE plugin targets our SharedCode target
 target_link_libraries("${PROJECT_NAME}" PRIVATE SharedCode)
