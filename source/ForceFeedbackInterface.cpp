@@ -15,21 +15,21 @@ ForceFeedbackInterface::~ForceFeedbackInterface() {
 }
 
 void ForceFeedbackInterface::init() {
+#if JUCE_WINDOWS
     HDErrorInfo error;
     ghHD = hdInitDevice(HD_DEFAULT_DEVICE);
 
     if (HD_DEVICE_ERROR(error = hdGetError())) {
-        hduPrintError(stderr, &error, "Failed to initialize haptic device");
+        // hduPrintError(stderr, &error, "Failed to initialize haptic device");
         return;
     }
-    std::cout << "Device initialized" << std::endl;
     schedulerHandle = hdScheduleAsynchronous(
         ffCallback, this,
         HD_MAX_SCHEDULER_PRIORITY);
 
     hdEnable(HD_FORCE_OUTPUT);
     hdStartScheduler();
-
+#endif
     initialized = true;
 
 }
@@ -40,13 +40,16 @@ juce::Vector3D<float> ForceFeedbackInterface::getCurrentPosition() {
 
 void ForceFeedbackInterface::deInit() {
     if (initialized) {
+#if JUCE_WINDOWS
         hdStopScheduler();
         hdUnschedule(schedulerHandle);
         hdDisableDevice(HD_DEFAULT_DEVICE);
         initialized = false;
+#endif
     }
 }
 
+#if JUCE_WINDOWS
 HDCallbackCode ForceFeedbackInterface::callback() {
     HHD hHD = hdGetCurrentDevice();
     hdBeginFrame(hHD);
@@ -99,6 +102,7 @@ HDCallbackCode ForceFeedbackInterface::callback() {
 
     return HD_CALLBACK_CONTINUE;
 }
+#endif
 
 bool ForceFeedbackInterface::isInitialized() {
     return initialized;
@@ -108,6 +112,8 @@ void ForceFeedbackInterface::setMappingCenter(MappingCenter* mc) {
     mappingCenter = mc;
 }
 
+#if JUCE_WINDOWS
 HDCallbackCode ffCallback(void *data) {
     return static_cast<ForceFeedbackInterface*>(data)->callback();
 }
+#endif

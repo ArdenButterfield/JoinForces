@@ -108,27 +108,19 @@ include(SharedCodeDefaults)
 # set(SourceFiles Source/PluginEditor.h Source/PluginProcessor.h Source/PluginEditor.cpp Source/PluginProcessor.cpp)
 file(GLOB_RECURSE SourceFiles CONFIGURE_DEPENDS
         "${CMAKE_CURRENT_SOURCE_DIR}/source/*.cpp" "${CMAKE_CURRENT_SOURCE_DIR}/source/*.h"
+if (MSVC)
         "${CMAKE_CURRENT_SOURCE_DIR}/OpenHaptics/Developer/3.5.0/utilities/src/HDU/src/*.cpp" "${CMAKE_CURRENT_SOURCE_DIR}/OpenHaptics/Developer/3.5.0/utilities/src/HDU/src/*.h"
         "${CMAKE_CURRENT_SOURCE_DIR}/OpenHaptics/Developer/3.5.0/utilities/src/HLU/src/*.cpp" "${CMAKE_CURRENT_SOURCE_DIR}/OpenHaptics/Developer/3.5.0/utilities/src/HLU/src/*.h"
-#        "${CMAKE_CURRENT_SOURCE_DIR}/OpenHaptics/libsrc/HDU/*.c" "${CMAKE_CURRENT_SOURCE_DIR}/OpenHaptics/libsrc/HDU/*.h"
-#        "${CMAKE_CURRENT_SOURCE_DIR}/OpenHaptics/libsrc/HLU/*.c" "${CMAKE_CURRENT_SOURCE_DIR}/OpenHaptics/libsrc/HLU/*.h"
+endif()
 )
 target_sources(SharedCode INTERFACE ${SourceFiles})
 
+if (MSVC)
 target_include_directories(SharedCode INTERFACE
         ${CMAKE_SOURCE_DIR}/OpenHaptics/Developer/3.5.0/include
         ${CMAKE_SOURCE_DIR}/OpenHaptics/Developer/3.5.0/utilities/include
 )
-
-#target_link_libraries(
-#        SharedCode INTERFACE
-#        ${CMAKE_SOURCE_DIR}/OpenHaptics/Developer/3.5.0/lib/x64/${CMAKE_BUILD_TYPE}/hd.lib
-#        ${CMAKE_SOURCE_DIR}/OpenHaptics/Developer/3.5.0/lib/x64/${CMAKE_BUILD_TYPE}/hl.lib
-#        ${CMAKE_SOURCE_DIR}/OpenHaptics/Developer/3.5.0/utilities/lib/x64/${CMAKE_BUILD_TYPE}/glut32.lib
-#        ${CMAKE_SOURCE_DIR}/OpenHaptics/Developer/3.5.0/utilities/lib/x64/${CMAKE_BUILD_TYPE}/glui32.lib
-#        ${CMAKE_SOURCE_DIR}/freeglut-MSVC-3.0.0-2.mp/freeglut/lib/x64/freeglut.lib
-#)
-
+endif()
 
 # Adds a BinaryData target for embedding assets into the binary
 include(Assets)
@@ -174,8 +166,10 @@ target_link_libraries(SharedCode
     juce::juce_recommended_config_flags
     juce::juce_recommended_lto_flags
     juce::juce_recommended_warning_flags
+if (MSVC)
     ${CMAKE_SOURCE_DIR}/OpenHaptics/Developer/3.5.0/lib/x64/${CMAKE_BUILD_TYPE}/hd.lib
     ${CMAKE_SOURCE_DIR}/OpenHaptics/Developer/3.5.0/lib/x64/${CMAKE_BUILD_TYPE}/hl.lib
+endif()
 )
 
 # Link the JUCE plugin targets our SharedCode target
