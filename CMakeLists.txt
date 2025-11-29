@@ -108,14 +108,14 @@ include(SharedCodeDefaults)
 # set(SourceFiles Source/PluginEditor.h Source/PluginProcessor.h Source/PluginEditor.cpp Source/PluginProcessor.cpp)
 file(GLOB_RECURSE SourceFiles CONFIGURE_DEPENDS
         "${CMAKE_CURRENT_SOURCE_DIR}/source/*.cpp" "${CMAKE_CURRENT_SOURCE_DIR}/source/*.h"
-if (MSVC)
+if (WIN32)
         "${CMAKE_CURRENT_SOURCE_DIR}/OpenHaptics/Developer/3.5.0/utilities/src/HDU/src/*.cpp" "${CMAKE_CURRENT_SOURCE_DIR}/OpenHaptics/Developer/3.5.0/utilities/src/HDU/src/*.h"
         "${CMAKE_CURRENT_SOURCE_DIR}/OpenHaptics/Developer/3.5.0/utilities/src/HLU/src/*.cpp" "${CMAKE_CURRENT_SOURCE_DIR}/OpenHaptics/Developer/3.5.0/utilities/src/HLU/src/*.h"
 endif()
 )
 target_sources(SharedCode INTERFACE ${SourceFiles})
 
-if (MSVC)
+if (WIN32)
 target_include_directories(SharedCode INTERFACE
         ${CMAKE_SOURCE_DIR}/OpenHaptics/Developer/3.5.0/include
         ${CMAKE_SOURCE_DIR}/OpenHaptics/Developer/3.5.0/utilities/include
@@ -166,7 +166,7 @@ target_link_libraries(SharedCode
     juce::juce_recommended_config_flags
     juce::juce_recommended_lto_flags
     juce::juce_recommended_warning_flags
-if (MSVC)
+if (WIN32)
     ${CMAKE_SOURCE_DIR}/OpenHaptics/Developer/3.5.0/lib/x64/${CMAKE_BUILD_TYPE}/hd.lib
     ${CMAKE_SOURCE_DIR}/OpenHaptics/Developer/3.5.0/lib/x64/${CMAKE_BUILD_TYPE}/hl.lib
 endif()

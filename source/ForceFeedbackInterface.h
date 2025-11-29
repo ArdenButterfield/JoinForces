@@ -8,9 +8,11 @@
 #include <juce_opengl/juce_opengl.h>
 
 #if JUCE_WINDOWS
+
 #include <HL/hl.h>
 #include <HDU/hduMatrix.h>
 #include <HDU/hduError.h>
+
 #endif
 
 class MappingCenter;
