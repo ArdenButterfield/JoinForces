@@ -8,6 +8,8 @@
 
 #include "melatonin_inspector/melatonin_inspector.h"
 
+#define MELATONIN_INSPECT false
+
 //==============================================================================
 class PluginEditor : public juce::AudioProcessorEditor, public juce::Button::Listener, public juce::Timer
 {
@@ -34,8 +36,12 @@ private:
     juce::Viewport mappingViewport;
     ForceAmountSliders forceAmountSliders;
 
+#if MELATONIN_INSPECT
     std::unique_ptr<melatonin::Inspector> inspector;
     juce::TextButton inspectButton { "Inspect the UI" };
+#endif
+    juce::Label title;
+    juce::Label byline;
     juce::TextButton exportToClipboardButton { "Export to Clipboard" };
     juce::TextButton importFromClipboardButton { "Import from Clipboard" };
 

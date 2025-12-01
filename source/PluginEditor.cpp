@@ -7,6 +7,16 @@
 PluginEditor::PluginEditor (PluginProcessor& p)
     : AudioProcessorEditor (&p), processorRef (p), mappingsPanel (*p.getMappingCenter()), forceAmountSliders (*p.getMappingCenter())
 {
+    title.setText ("JoinForces", juce::dontSendNotification);
+    byline.setText ("Arden Butterfield", juce::dontSendNotification);
+
+    title.setFont (juce::Font(juce::FontOptions(24)));
+    byline.setFont (juce::Font(juce::FontOptions(12)));
+
+    title.setColour (juce::Label::textColourId, JoinForcesLookFeel::getTextColour());
+    byline.setColour (juce::Label::textColourId, JoinForcesLookFeel::getTextColour());
+
+#if MELATONIN_INSPECT
     addAndMakeVisible (inspectButton);
 
     // this chunk of code instantiates and opens the melatonin inspector
@@ -19,13 +29,21 @@ PluginEditor::PluginEditor (PluginProcessor& p)
 
         inspector->setVisible (true);
     };
+#endif
 
-    for (auto button : {&addPluginButton, &inspectButton, &exportToClipboardButton, &importFromClipboardButton}) {
+    for (auto button : {&addPluginButton,
+#if MELATONIN_INSPECT
+        &inspectButton,
+#endif
+        &exportToClipboardButton, &importFromClipboardButton, &createMappingButton}) {
         button->setColour (juce::TextButton::buttonColourId,    JoinForcesLookFeel::getBackgroundColour());
         button->setColour(juce::TextButton::buttonOnColourId, JoinForcesLookFeel::getShadowColour());
         button->setColour (juce::TextButton::textColourOffId, JoinForcesLookFeel::getTextColour());
         button->setColour (juce::TextButton::textColourOnId, JoinForcesLookFeel::getTextColour());
     }
+
+    addAndMakeVisible (title);
+    addAndMakeVisible (byline);
 
     addAndMakeVisible (forceAmountSliders);
     addAndMakeVisible (mappingViewport);
@@ -40,7 +58,6 @@ PluginEditor::PluginEditor (PluginProcessor& p)
     addAndMakeVisible(importFromClipboardButton);
     addAndMakeVisible(exportToClipboardButton);
 
-    // this chunk of code instantiates and opens the melatonin inspector
     addPluginButton.onClick = [&] {
         fileChooser = std::make_unique<juce::FileChooser> ("Select an audio plugin",
 #if JUCE_WINDOWS
@@ -114,12 +131,18 @@ void PluginEditor::paint (juce::Graphics& g)
 
 void PluginEditor::resized()
 {
-    inspectButton.setBounds({0,0,150, 40});
-    importFromClipboardButton.setBounds(inspectButton.getBounds().withX(inspectButton.getRight() + 10));
+    juce::Rectangle title_bounds = {10,10,150, 40};
+
+    title.setBounds(title_bounds.withHeight (30));
+    byline.setBounds(title_bounds.withTrimmedTop (title.getHeight()));
+#if MELATONIN_INSPECT
+    inspectButton.setBounds(title_bounds);
+#endif
+    importFromClipboardButton.setBounds(title_bounds.withX(title_bounds.getRight() + 10));
     exportToClipboardButton.setBounds(importFromClipboardButton.getBounds().withX(importFromClipboardButton.getRight() + 10));
     inputEnabledButton.setBounds(exportToClipboardButton.getBounds().withX(exportToClipboardButton.getRight() + 10));
 
-    auto usableArea = getLocalBounds().withSizeKeepingCentre(getWidth() - 20, getHeight() - 20).withTop(inspectButton.getBottom() + 10);
+    auto usableArea = getLocalBounds().withSizeKeepingCentre(getWidth() - 20, getHeight() - 20).withTop(title_bounds.getBottom() + 10);
 
     createMappingButton.setBounds(usableArea.withHeight(30).withWidth(150));
     addPluginButton.setBounds(createMappingButton.getBounds().withY(createMappingButton.getBottom() + 10));
