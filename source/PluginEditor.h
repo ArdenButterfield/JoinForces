@@ -8,7 +8,7 @@
 
 #include "melatonin_inspector/melatonin_inspector.h"
 
-#define MELATONIN_INSPECT false
+#define MELATONIN_INSPECT true
 
 //==============================================================================
 class PluginEditor : public juce::AudioProcessorEditor, public juce::Button::Listener, public juce::Timer

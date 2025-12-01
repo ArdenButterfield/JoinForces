@@ -21,6 +21,8 @@ public:
     ~MappingsPanel() override;
     void paint(juce::Graphics &g) override;
     void resized() override;
+    void rebuild();
+    void clearAll();
 private:
     void buttonClicked(juce::Button *) override;
     void buttonStateChanged(juce::Button *) override;

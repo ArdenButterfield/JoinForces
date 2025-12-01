@@ -35,7 +35,7 @@ struct MappingPoint {
 class MappingCenter : public juce::AudioProcessorParameter::Listener, public juce::Timer {
 public:
     MappingCenter(const juce::AudioProcessor::BusesLayout &layout, ForceFeedbackInterface& ffInterface);
-    ~MappingCenter();
+    ~MappingCenter() override;
     void createMappingAtCurrentState();
     std::list<MappingPoint>& getMappings() {
         return mappings;
@@ -74,7 +74,6 @@ public:
     juce::AudioParameterFloat* amountOfPointFeedback;
 
     bool inputEnabled;
-
 
 private:
     juce::Vector3D<float> mappingPointAttractionForce;

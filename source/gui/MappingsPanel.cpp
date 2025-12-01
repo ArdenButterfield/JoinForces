@@ -44,7 +44,40 @@ void MappingsPanel::resized() {
         mappingPointColumn->setTopLeftPosition(x, 0);
         x += JoinForcesLookFeel::getColumnWidth();
     }
-    positionsVisualizer->setBounds(parameterNamesColumn->getBounds().withHeight(JoinForcesLookFeel::getPositionVizHeight()));
+    positionsVisualizer->setBounds(parameterNamesColumn->getBounds()
+        .withHeight(JoinForcesLookFeel::getPositionVizHeight())
+        .withWidth(JoinForcesLookFeel::getNamesColumnWidth()));
+}
+void MappingsPanel::rebuild()
+{
+    mappingPointColumns.clear();
+
+    int i = 1;
+    for (auto& mapping: mappingCenter.getMappings()) {
+        mappingPointColumns.push_back(std::make_unique<SliderColumn>(mappingCenter, mapping, i));
+        ++i;
+    }
+
+    parameterNamesColumn = std::make_unique<ParameterNamesColumn>(mappingCenter);
+    addAndMakeVisible(parameterNamesColumn.get());
+
+    positionsVisualizer = std::make_unique<PositionsVisualizer>(mappingCenter);
+    addAndMakeVisible(positionsVisualizer.get());
+
+    currentColumn = std::make_unique<SliderColumn>(mappingCenter, mappingCenter.getCurrentMapping(), 0);
+    addAndMakeVisible (currentColumn.get());
+
+    for (auto& column : mappingPointColumns) {
+        addAndMakeVisible(column.get());
+    }
+    resized();
+}
+void MappingsPanel::clearAll()
+{
+    mappingPointColumns.clear();
+    parameterNamesColumn = nullptr;
+    positionsVisualizer = nullptr;
+    currentColumn = nullptr;
 }
 
 void MappingsPanel::buttonClicked(juce::Button *) {
@@ -55,17 +88,7 @@ void MappingsPanel::buttonStateChanged(juce::Button*) {
 
 void MappingsPanel::timerCallback() {
     if (mappingCenter.getMappings().size() != mappingPointColumns.size()) {
-        mappingPointColumns.clear();
-
-        int i = 1;
-        for (auto& mapping: mappingCenter.getMappings()) {
-            mappingPointColumns.push_back(std::make_unique<SliderColumn>(mappingCenter, mapping, i));
-            ++i;
-        }
-
-        for (auto& column : mappingPointColumns) {
-            addAndMakeVisible(column.get());
-        }
+        rebuild();
     }
     setSize(JoinForcesLookFeel::getMappingPanelRequiredWidth(mappingCenter),
         JoinForcesLookFeel::getColumnRequiredHeight(mappingCenter));

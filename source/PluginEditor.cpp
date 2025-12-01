@@ -88,6 +88,7 @@ PluginEditor::PluginEditor (PluginProcessor& p)
         auto element = juce::XmlDocument::parse(juce::SystemClipboard::getTextFromClipboard());
         if (element.get() != nullptr) {
             processorRef.getMappingCenter()->importFromXml(*element);
+            mappingsPanel.rebuild();
         }
     };
 
@@ -133,10 +134,11 @@ void PluginEditor::resized()
 {
     juce::Rectangle title_bounds = {10,10,150, 40};
 
-    title.setBounds(title_bounds.withHeight (30));
-    byline.setBounds(title_bounds.withTrimmedTop (title.getHeight()));
 #if MELATONIN_INSPECT
     inspectButton.setBounds(title_bounds);
+#else
+    title.setBounds(title_bounds.withHeight (30));
+    byline.setBounds(title_bounds.withTrimmedTop (title.getHeight()));
 #endif
     importFromClipboardButton.setBounds(title_bounds.withX(title_bounds.getRight() + 10));
     exportToClipboardButton.setBounds(importFromClipboardButton.getBounds().withX(importFromClipboardButton.getRight() + 10));

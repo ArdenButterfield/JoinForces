@@ -308,8 +308,8 @@ void MappingCenter::importFromXml(const juce::XmlElement &xml) {
         return;
     }
     currentMapping.position.x = static_cast<float>(currentPosition->getDoubleAttribute("x", 0));
-    currentMapping.position.x = static_cast<float>(currentPosition->getDoubleAttribute("x", 0));
-    currentMapping.position.x = static_cast<float>(currentPosition->getDoubleAttribute("x", 0));
+    currentMapping.position.y = static_cast<float>(currentPosition->getDoubleAttribute("y", 0));
+    currentMapping.position.z = static_cast<float>(currentPosition->getDoubleAttribute("z", 0));
     pluginGroup.resetAllPlugins();
     auto currentPlugins = currentState->getChildByName("plugins");
     if (currentPlugins != nullptr) {
@@ -353,8 +353,8 @@ void MappingCenter::importFromXml(const juce::XmlElement &xml) {
             continue;
         }
         newMapping.position.x = static_cast<float>(mapPosition->getDoubleAttribute("x", 0));
-        newMapping.position.x = static_cast<float>(mapPosition->getDoubleAttribute("x", 0));
-        newMapping.position.x = static_cast<float>(mapPosition->getDoubleAttribute("x", 0));
+        newMapping.position.y = static_cast<float>(mapPosition->getDoubleAttribute("y", 0));
+        newMapping.position.z = static_cast<float>(mapPosition->getDoubleAttribute("z", 0));
         auto plugs = mapPoint->getChildByName("plugins");
         if (plugs != nullptr) {
             newMapping.pluginParameters.clear();
