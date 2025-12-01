@@ -5,7 +5,7 @@
 #include "MappingCenter.h"
 
 #include <utility>
-#include <cmath>
+#include <math.h>
 #include "ForceFeedbackInterface.h"
 
 #include "PluginGroup.h"
@@ -506,7 +506,7 @@ juce::Vector3D<float> MappingCenter::calculateWallPushbackForce(const juce::Vect
                 const auto normalizedGradient = parameterGradient.normalised();
 
 
-                const auto scaledParameterValue = std::fmodf(parameterValue * static_cast<float>(numSteps - 1), 1.f);
+                const auto scaledParameterValue = fmodf(parameterValue * static_cast<float>(numSteps - 1), 1.f);
                 const auto wallZoneWidth = 0.1f * parameterGradient.length();
                 if ((scaledParameterValue <= 0.5f) && (scaledParameterValue > 0.5f - wallZoneWidth)) {
                     // below a wall
