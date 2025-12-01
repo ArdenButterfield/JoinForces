@@ -98,9 +98,10 @@ jobs:
       - name: Build
         run: cmake --build ${{ env.BUILD_DIR }} --config ${{ env.BUILD_TYPE }}
 
-#      - name: Test & Benchmarks
-#        working-directory: ${{ env.BUILD_DIR }}
-#        run: ctest --verbose --output-on-failure
+      - name: Test & Benchmarks
+        working-directory: ${{ env.BUILD_DIR }}
+        if: ${{ matrix.name != 'Windows' }}
+        run: ctest --verbose --output-on-failure
 
       - name: Read in .env from CMake # see GitHubENV.cmake
         run: |
@@ -119,6 +120,7 @@ jobs:
           echo "ARTIFACT_NAME=${{ env.PRODUCT_NAME }}-${{ env.VERSION }}-${{ matrix.name }}" >> $GITHUB_ENV
 
       - name: Pluginval
+        if: ${{ matrix.name != 'Windows' }}
         run: |
           curl -LO "https://github.com/Tracktion/pluginval/releases/download/v1.0.4/pluginval_${{ matrix.name }}.zip"
           7z x pluginval_${{ matrix.name }}.zip
